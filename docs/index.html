@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Macondo Matrix</title>
     <style>
-        :root { --bg: #f5f5f7; --primary: #2980b9; --accent: #f39c12; --card: #ffffff; --border: #e0e0e0; --text: #333; --btn-blue: #6482f0; }
-        body, html { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); height: 100%; overflow-y: auto; -webkit-font-smoothing: antialiased; }
+        :root { --bg: #f5f5f7; --primary: #2980b9; --accent: #f39c12; --card: #ffffff; --border: #e0e0e0; --text: #333; }
+        body, html { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); height: 100%; overflow-y: auto; -webkit-font-smoothing: antialiased; }
         
         .container { max-width: 600px; margin: 0 auto; padding: 20px; box-sizing: border-box; }
         .header { text-align: center; padding: 20px 0; border-bottom: 1px dashed var(--border); margin-bottom: 20px; position: relative; }
@@ -14,31 +14,8 @@
         .header p { margin: 0; font-size: 0.9rem; color: #7f8c8d; letter-spacing: 1px; }
         .settings-btn { position: absolute; right: 0; top: 20px; background: none; border: none; font-size: 1.4rem; cursor: pointer; opacity: 0.8; }
         
-        /* 更新控件布局 */
-        .controls { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 20px; }
-        .select-box { padding: 0 12px; border: 1px solid var(--border); border-radius: 6px; outline: none; font-weight: bold; background: var(--card); color: var(--primary); height: 36px; box-sizing: border-box; font-size: 0.95rem; }
-        
-        /* 新增按钮样式 */
-        .btn-nav, .btn-today {
-            background-color: var(--btn-blue);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 36px;
-            box-sizing: border-box;
-            font-weight: 600;
-        }
-        .btn-nav { width: 36px; padding: 0; }
-        .btn-today { padding: 0 12px; }
-        .btn-nav:active, .btn-today:active { transform: scale(0.95); }
-        .btn-nav:hover, .btn-today:hover { opacity: 0.9; }
-
+        .controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .select-box { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-weight: bold; background: var(--card); color: var(--primary); }
         .calendar-wrapper { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; }
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 13px; color: #888; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
@@ -71,7 +48,6 @@
             <button class="settings-btn" onclick="document.getElementById('modal').style.display='flex'">⚙️</button>
         </div>
         <div class="controls">
-            <button class="btn-nav" id="prevMonthBtn">&lt;</button>
             <select class="select-box" id="yearSelect"></select>
             <select class="select-box" id="monthSelect">
                 <option value="1">01月</option><option value="2">02月</option><option value="3">03月</option>
@@ -79,8 +55,6 @@
                 <option value="7">07月</option><option value="8">08月</option><option value="9">09月</option>
                 <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
             </select>
-            <button class="btn-nav" id="nextMonthBtn">&gt;</button>
-            <button class="btn-today" id="todayBtn">回到今天</button>
         </div>
         <div class="calendar-wrapper">
             <div class="weekdays"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
@@ -92,7 +66,7 @@
     <div class="modal" id="modal">
         <div class="modal-content">
             <h3 style="margin-top:0; color:#2c3e50;">配置核心 Token</h3>
-            <p style="font-size:0.8rem; color:#888; margin-top:-10px;">用于同步子页面的后续无痕编辑修改</p>
+            <p style="font-size:0.8rem; color:#888; margin-top:-10px;">用于同步编辑的纯净数据</p>
             <input type="password" id="gh-token" placeholder="输入你的 GitHub Token">
             <button onclick="saveSettings()">💾 永久保存至本地</button>
         </div>
@@ -105,7 +79,7 @@
             }
         };
 
-        const archiveData = {"2026": {"6": {"28": [{"time": "18:43", "path": "2026/06/2026_06_28_184321.html", "title": "\ud83d\udccc \u8bed\u6cd5\u89e3\u6784"}]}}};
+        const archiveData = {"2026": {"6": {}}};
         const today = new Date();
         let sY = today.getFullYear(), sM = today.getMonth() + 1, sD = today.getDate();
         
@@ -116,32 +90,11 @@
         function initSelects() {
             const years = Object.keys(archiveData).map(Number).sort((a,b)=>b-a);
             if(!years.includes(sY)) years.unshift(sY);
-            yearSelect.innerHTML = ''; // 清空重新生成
             years.forEach(y => {
                 const opt = document.createElement('option'); opt.value = y; opt.textContent = y + '年';
                 yearSelect.appendChild(opt);
             });
             yearSelect.value = sY; monthSelect.value = sM;
-        }
-
-        // 同步 UI 状态
-        function syncUI() {
-            let yearFound = false;
-            for(let i=0; i<yearSelect.options.length; i++) {
-                if(parseInt(yearSelect.options[i].value) === sY) { yearFound = true; break; }
-            }
-            if(!yearFound) {
-                const opt = document.createElement('option'); opt.value = sY; opt.textContent = sY + '年';
-                yearSelect.appendChild(opt);
-            }
-            yearSelect.value = sY;
-            monthSelect.value = sM;
-        }
-
-        // 限制日期合法性
-        function clampDate() {
-            const daysInMonth = new Date(sY, sM, 0).getDate();
-            if (sD > daysInMonth) sD = daysInMonth;
         }
         
         function renderCalendar() {
@@ -176,7 +129,6 @@
         function renderList() {
             const list = document.getElementById('feedList');
             const data = (archiveData[sY] && archiveData[sY][sM] && archiveData[sY][sM][sD]) || [];
-            
             if(data.length) {
                 const itemsHtml = data.map(item => `<a href="${item.path}" class="feed-item"><span class="feed-time">${item.time}</span><span class="feed-title">${item.title}</span></a>`).join('');
                 list.innerHTML = itemsHtml;
@@ -185,28 +137,8 @@
             }
         }
         
-        yearSelect.onchange = e => { sY = parseInt(e.target.value); clampDate(); renderCalendar(); renderList(); };
-        monthSelect.onchange = e => { sM = parseInt(e.target.value); clampDate(); renderCalendar(); renderList(); };
-
-        // 按钮事件绑定
-        document.getElementById('prevMonthBtn').onclick = () => {
-            sM--;
-            if(sM < 1) { sM = 12; sY--; }
-            clampDate(); syncUI(); renderCalendar(); renderList();
-        };
-
-        document.getElementById('nextMonthBtn').onclick = () => {
-            sM++;
-            if(sM > 12) { sM = 1; sY++; }
-            clampDate(); syncUI(); renderCalendar(); renderList();
-        };
-
-        document.getElementById('todayBtn').onclick = () => {
-            sY = today.getFullYear();
-            sM = today.getMonth() + 1;
-            sD = today.getDate();
-            syncUI(); renderCalendar(); renderList();
-        };
+        yearSelect.onchange = e => { sY = parseInt(e.target.value); renderCalendar(); renderList(); };
+        monthSelect.onchange = e => { sM = parseInt(e.target.value); renderCalendar(); renderList(); };
         
         function saveSettings() {
             localStorage.setItem('GH_TOKEN', document.getElementById('gh-token').value.trim());
