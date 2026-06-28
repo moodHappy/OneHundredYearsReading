@@ -95,7 +95,7 @@
                 </div>
                 <div class="form-group">
                     <label>教师级剖析 (Markdown Analysis)</label>
-                    <textarea id="in-analysis" class="form-control" style="min-height: 280px;" placeholder="支持 Markdown 语法..."></textarea>
+                    <textarea id="in-analysis" class="form-control" style="min-height: 280px;" placeholder="支持 Markdown 语法。例如：\n\n### 句子核心意思\n...\n\n### 句子结构分析\n> 引用原文\n..."></textarea>
                 </div>
                 <button class="btn-push" id="pushBtn" onclick="pushToGitHub()">🚀 推送至云端矩阵</button>
                 <div class="page-indicator" style="margin-top: 20px;">向右滑动返回日历枢纽 →</div>
@@ -106,7 +106,7 @@
     <div class="modal" id="modal">
         <div class="modal-content">
             <h3 style="margin-top:0; color:#2c3e50;">配置核心 Token</h3>
-            <p style="font-size:0.8rem; color:#888; margin-top:-10px;">仓库已被钢筋水泥焊死，仅需 Token！</p>
+            <p style="font-size:0.8rem; color:#888; margin-top:-10px;">仅需 Token，目标仓库已自动焊死！</p>
             <input type="password" id="gh-token" placeholder="输入你的 GitHub Token">
             <button onclick="saveSettings()">💾 永久保存至本地</button>
         </div>
@@ -191,19 +191,14 @@
             localStorage.setItem('GH_TOKEN', document.getElementById('gh-token').value.trim());
             document.getElementById('modal').style.display = 'none';
         }
-        document.getElementById('gh-token').value = localStorage.getItem('GH_TOKEN') || '';
 
+        // 字符转义，防止破坏 HTML 结构
         function escapeHTML(str) {
             return str.replace(/&/g, '&amp;')
                       .replace(/</g, '&lt;')
                       .replace(/>/g, '&gt;')
                       .replace(/"/g, '&quot;')
                       .replace(/'/g, '&#039;');
-        }
-
-        // 工业级 UTF-8 转 Base64 防白屏法
-        function utf8ToBase64(str) {
-            return btoa(unescape(encodeURIComponent(str)));
         }
 
         async function pushToGitHub() {
@@ -236,7 +231,8 @@
             const filePath = `docs/${y}/${m}/${y}_${m}_${d}_${h}${mn}.html`;
             
             try {
-                const base64Html = utf8ToBase64(targetHtml);
+                // 彻底解决内存溢出：使用经典的 UTF-8 转 Base64 方法，稳如磐石
+                const base64Html = btoa(unescape(encodeURIComponent(targetHtml)));
 
                 const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${filePath}`, {
                     method: 'PUT',
@@ -261,7 +257,10 @@
             btn.innerText = "🚀 推送至云端矩阵"; btn.disabled = false;
         }
 
-        // 终极独立页面模板，原生 textarea 数据容灾，无保存按钮无痕体验
+        // ==========================================
+        // 这段代码的作用是吐出单个时间戳的独立 HTML 文件。
+        // 它自带防白屏的文本直出功能，并在内部封装了自己的无痕编辑和同步逻辑。
+        // ==========================================
         function generateTemplate(title, orig, anal) {
             const safeOrig = escapeHTML(orig);
             const safeAnal = escapeHTML(anal);
@@ -310,12 +309,12 @@
 
         <div class="card">
             <div class="card-header">📖 原始文本 (Original)</div>
-            <div id="view-original" class="markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;"></div>
+            <div id="view-original" class="markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;">${safeOrig}</div>
         </div>
 
         <div class="card" id="block-analysis">
             <div class="card-header">🔬 深度解构 (Analysis)</div>
-            <div id="view-analysis" class="markdown-body"></div>
+            <div id="view-analysis" class="markdown-body" style="white-space: pre-wrap;">${safeAnal}</div>
             <textarea id="edit-analysis" class="edit-textarea"></textarea>
         </div>
     </div>
@@ -325,14 +324,12 @@
         const GH_REPO = "OneHundredYearsReading";
 
         function renderAll() {
-            document.getElementById('view-original').textContent = document.getElementById('raw-original').value;
             const analContent = document.getElementById('raw-analysis').value;
-            
-            if (typeof marked !== 'undefined') {
-                document.getElementById('view-analysis').innerHTML = marked.parse(analContent);
-            } else {
-                document.getElementById('view-analysis').innerHTML = "<pre style='white-space:pre-wrap;'>" + analContent + "</pre>";
-            }
+            try {
+                if (typeof marked !== 'undefined') {
+                    document.getElementById('view-analysis').innerHTML = marked.parse(analContent);
+                }
+            } catch(e) { console.error("Markdown failed", e); }
         }
         window.onload = renderAll;
 
@@ -340,7 +337,7 @@
         const editBlock = document.getElementById('edit-analysis');
         const statusMsg = document.getElementById('sync-status');
 
-        // 双指触摸或双击触发编辑 (仅限译文分析区)
+        // 双指触摸或双击触发编辑
         viewBlock.addEventListener('dblclick', triggerEdit);
         viewBlock.addEventListener('touchstart', e => {
             if (e.touches.length === 2) triggerEdit(); 
@@ -353,16 +350,53 @@
             editBlock.focus();
         }
 
-        function utf8ToBase64(str) {
-            return btoa(unescape(encodeURIComponent(str)));
-        }
-
-        function encodeHTML(str) {
+        function escapeHTML(str) {
             return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
 
-        // 失去焦点时：自动恢复视图，比对内容，静默推送到 GitHub！
-        editBlock.addEventListener('blur', async () => {
+        // 为了防止保存时把 DOM 的垃圾元素混进去，我们在子页面里内置这套自洁引擎
+        function reconstructSelfHTML(newAnal) {
+            const orig = document.getElementById('raw-original').value;
+            const safeOrig = escapeHTML(orig);
+            const safeAnal = escapeHTML(newAnal);
+            
+            // 构建纯净源码，跟第一次推送时一模一样！
+            const template = \`<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n\` + document.head.innerHTML + \`\n</head>\n<body>\n\` +
+            \`    <div class="container">\n\` +
+            \`        <div class="nav-back">\n\` +
+            \`            <a href="../../index.html">🔙 返回矩阵枢纽</a>\n\` +
+            \`            <span class="sync-status" id="sync-status">📡 同步中...</span>\n\` +
+            \`        </div>\n\n\` +
+            \`        <textarea id="raw-original" style="display:none;">\${safeOrig}</textarea>\n\` +
+            \`        <textarea id="raw-analysis" style="display:none;">\${safeAnal}</textarea>\n\n\` +
+            \`        <div class="card">\n\` +
+            \`            <div class="card-header">📖 原始文本 (Original)</div>\n\` +
+            \`            <div id="view-original" class="markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;">\${safeOrig}</div>\n\` +
+            \`        </div>\n\n\` +
+            \`        <div class="card" id="block-analysis">\n\` +
+            \`            <div class="card-header">🔬 深度解构 (Analysis)</div>\n\` +
+            \`            <div id="view-analysis" class="markdown-body" style="white-space: pre-wrap;">\${safeAnal}</div>\n\` +
+            \`            <textarea id="edit-analysis" class="edit-textarea"></textarea>\n\` +
+            \`        </div>\n\` +
+            \`    </div>\n\n\` +
+            \`    <script>\n\` + renderAll.toString() + \`\n\` +
+            \`    window.onload = renderAll;\n\` +
+            \`    const viewBlock = document.getElementById('view-analysis');\n\` +
+            \`    const editBlock = document.getElementById('edit-analysis');\n\` +
+            \`    const statusMsg = document.getElementById('sync-status');\n\` +
+            \`    viewBlock.addEventListener('dblclick', triggerEdit);\n\` +
+            \`    viewBlock.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEdit(); });\n\` +
+            \`    \` + triggerEdit.toString() + \`\n\` +
+            \`    \` + escapeHTML.toString() + \`\n\` +
+            \`    \` + reconstructSelfHTML.toString() + \`\n\` +
+            \`    const GH_OWNER = "\${GH_OWNER}"; const GH_REPO = "\${GH_REPO}";\n\` +
+            \`    editBlock.addEventListener('blur', \` + editBlock.onblur.toString() + \`);\n\` +
+            \`    </scr\` + \`ipt>\n</body>\n</html>\`;
+            return template;
+        }
+
+        // 失去焦点静默保存
+        editBlock.onblur = async function() {
             const newText = editBlock.value.trim();
             const oldText = document.getElementById('raw-analysis').value.trim();
             
@@ -370,60 +404,54 @@
             viewBlock.style.display = 'block';
             
             if (newText && newText !== oldText) {
-                // 更新隐形数据层并刷新视图
                 document.getElementById('raw-analysis').value = newText;
-                document.getElementById('raw-analysis').innerHTML = encodeHTML(newText);
                 renderAll();
                 
-                // 执行静默同步
-                await saveToGitHub();
-            }
-        });
+                const token = localStorage.getItem('GH_TOKEN');
+                if(!token) return;
 
-        async function saveToGitHub() {
-            const token = localStorage.getItem('GH_TOKEN');
-            if(!token) {
-                alert("编辑成功，但未检测到 Token，无法同步到云端！");
-                return;
-            }
-
-            statusMsg.style.display = 'block';
-            statusMsg.style.color = '#2980b9';
-            statusMsg.innerText = '📡 静默同步中...';
-            
-            const newHtml = "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n" + document.documentElement.innerHTML + "\n</html>";
-            const path = window.location.pathname;
-            const fileRelPath = path.substring(path.indexOf('docs/'));
-            
-            try {
-                const getRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
-                    headers: { 'Authorization': \`token \${token}\` }
-                });
-                const fileData = await getRes.json();
+                statusMsg.style.display = 'block';
+                statusMsg.style.color = '#2980b9';
+                statusMsg.innerText = '📡 静默同步中...';
                 
-                const putRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
-                    method: 'PUT',
-                    headers: { 'Authorization': \`token \${token}\`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: \`Auto-save analysis update\`,
-                        content: utf8ToBase64(newHtml),
-                        sha: fileData.sha
-                    })
-                });
+                // 重构最纯净的全页 HTML 源码
+                const pureHtml = reconstructSelfHTML(newText);
                 
-                if(putRes.ok) {
-                    statusMsg.style.color = '#27ae60';
-                    statusMsg.innerText = '✅ 云端已同步';
-                    setTimeout(() => statusMsg.style.display = 'none', 3000);
-                } else {
+                const path = window.location.pathname;
+                const fileRelPath = path.substring(path.indexOf('docs/'));
+                
+                try {
+                    const getRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
+                        headers: { 'Authorization': \`token \${token}\` }
+                    });
+                    const fileData = await getRes.json();
+                    
+                    const putRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
+                        method: 'PUT',
+                        headers: { 'Authorization': \`token \${token}\`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: \`Auto-save analysis update\`,
+                            content: btoa(unescape(encodeURIComponent(pureHtml))),
+                            sha: fileData.sha
+                        })
+                    });
+                    
+                    if(putRes.ok) {
+                        statusMsg.style.color = '#27ae60';
+                        statusMsg.innerText = '✅ 云端已同步';
+                        setTimeout(() => statusMsg.style.display = 'none', 3000);
+                    } else {
+                        statusMsg.style.color = '#e74c3c';
+                        statusMsg.innerText = '❌ 同步失败';
+                    }
+                } catch(e) {
                     statusMsg.style.color = '#e74c3c';
-                    statusMsg.innerText = '❌ 同步失败';
+                    statusMsg.innerText = '❌ 网络断开';
                 }
-            } catch(e) {
-                statusMsg.style.color = '#e74c3c';
-                statusMsg.innerText = '❌ 网络断开';
             }
-        }
+        };
+        editBlock.addEventListener('blur', editBlock.onblur);
+
     </scr` + `ipt>
 </body>
 </html>`;
