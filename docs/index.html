@@ -175,7 +175,7 @@
             const data = (archiveData[sY] && archiveData[sY][sM] && archiveData[sY][sM][sD]) || [];
             
             // 永远霸榜的百年孤独目录链接
-            const pinnedLink = `<a href="https://moodhappy.github.io/MiyetsukoSeries/Books/Hundred/%E7%99%BE%E5%B9%B4%E5%AD%A4%E7%8B%AC%E7%9B%AE%E5%BD%95_1782298920000.html" class="feed-item" style="border-left: 4px solid #f39c12; background: #fffdf7;"><span class="feed-time" style="color: #f39c12;">📌 目录</span><span class="feed-title" style="color: #333; font-weight: bold;">One Hundred Years of Solitude</span></a>`;
+            const pinnedLink = `<a href="https://moodhappy.github.io/MiyetsukoSeries/Books/Hundred/%E7%99%BE%E5%B9%B4%E5%AD%A4%E7%8B%AC%E7%9B%AE%E5%BD%95_1782298920000.html" class="feed-item" style="border-left: 4px solid #f39c12; background: #fffdf7;"><span class="feed-time" style="color: #f39c12;">📌 </span><span class="feed-title" style="color: #333; font-weight: bold;">One Hundred Years of Solitude</span></a>`;
             
             if(data.length) {
                 const itemsHtml = data.map(item => `<a href="${item.path}" class="feed-item"><span class="feed-time">${item.time}</span><span class="feed-title">${item.title}</span></a>`).join('');
