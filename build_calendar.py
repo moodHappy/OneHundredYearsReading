@@ -1,6 +1,5 @@
 import os
 import json
-import re
 
 BASE_DIR = "docs"
 
@@ -8,24 +7,30 @@ def generate_index():
     os.makedirs(BASE_DIR, exist_ok=True)
     
     print("⚙️ 正在重新编译全栈语法枢纽...")
-    # 扫描归档目录，构建日历数据
     archive_data = {}
+    
+    # 扫描年份文件夹
     years = [d for d in os.listdir(BASE_DIR) if d.isdigit()]
     for year in years:
-        archive_data[year] = {}
+        y_int = int(year) # 强转为整数，彻底消除 "2026" 变 "026" 等隐患
+        if y_int not in archive_data:
+            archive_data[y_int] = {}
+            
         months = [d for d in os.listdir(os.path.join(BASE_DIR, year)) if d.isdigit()]
         for month in months:
-            archive_data[year][month] = {}
+            m_int = int(month) # 强转为整数，彻底消除 "06" 和 6 不匹配的日历瞎眼BUG
+            if m_int not in archive_data[y_int]:
+                archive_data[y_int][m_int] = {}
+                
             files = sorted([f for f in os.listdir(os.path.join(BASE_DIR, year, month)) if f.endswith('.html')], reverse=True)
             for file in files:
                 try:
                     parts = file.replace(".html", "").split('_')
                     if len(parts) >= 4:
-                        day = parts[2]
+                        d_int = int(parts[2]) # 强转为整数
                         time_str = f"{parts[3][:2]}:{parts[3][2:]}"
                         file_path = f"{year}/{month}/{file}"
                         
-                        # 提取生成的 HTML 标题
                         title = "📌 语法解构"
                         with open(os.path.join(BASE_DIR, year, month, file), 'r', encoding='utf-8') as f_html:
                             content = f_html.read(1500)
@@ -34,14 +39,14 @@ def generate_index():
                             if start != -1 and end != -1:
                                 title = content[start+7:end]
 
-                        if day not in archive_data[year][month]:
-                            archive_data[year][month][day] = []
-                        archive_data[year][month][day].append({"time": time_str, "path": file_path, "title": title})
-                except: pass
+                        if d_int not in archive_data[y_int][m_int]:
+                            archive_data[y_int][m_int][d_int] = []
+                        archive_data[y_int][m_int][d_int].append({"time": time_str, "path": file_path, "title": title})
+                except Exception as e:
+                    print(f"解析文件出错 {file}: {e}")
 
     json_data = json.dumps(archive_data)
 
-    # 包含滑动双屏、日历渲染和 GitHub API 提交流水线的终极前端
     html_content = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -92,6 +97,7 @@ def generate_index():
         textarea.form-control { min-height: 120px; line-height: 1.5; }
         .btn-push { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 10px; font-size: 1.15rem; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(41,128,185,0.3); transition: background 0.2s; }
         .btn-push:active { transform: scale(0.98); background: #2471a3; }
+        .btn-push:disabled { background: #95a5a6; cursor: not-allowed; box-shadow: none; }
         
         /* 模态框 */
         .modal { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(4px); }
@@ -104,7 +110,6 @@ def generate_index():
 </head>
 <body>
     <div class="viewport" id="viewport">
-        <!-- 第一页：日历归档 -->
         <div class="page" id="page-1">
             <div class="container">
                 <div class="header">
@@ -130,7 +135,6 @@ def generate_index():
             </div>
         </div>
         
-        <!-- 第二页：输入控制台 -->
         <div class="page" id="page-2">
             <div class="container">
                 <div class="header">
@@ -143,7 +147,7 @@ def generate_index():
                 </div>
                 <div class="form-group">
                     <label>教师级剖析 (Markdown Analysis)</label>
-                    <textarea id="in-analysis" class="form-control" style="min-height: 280px;" placeholder="支持 Markdown 语法。例如：\n\n### 句子核心意思\n...\n\n### 句子结构分析\n> 引用原文\n..."></textarea>
+                    <textarea id="in-analysis" class="form-control" style="min-height: 280px;" placeholder="支持 Markdown 语法。例如：\\n\\n### 句子核心意思\\n...\\n\\n### 句子结构分析\\n> 引用原文\\n..."></textarea>
                 </div>
                 <button class="btn-push" id="pushBtn" onclick="pushToGitHub()">🚀 推送至云端矩阵</button>
                 <div class="page-indicator" style="margin-top: 20px;">向右滑动返回日历枢纽 →</div>
@@ -151,14 +155,14 @@ def generate_index():
         </div>
     </div>
 
-    <!-- 弹窗配置 -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <h3 style="margin-top:0; color:#2c3e50;">配置核心 Token</h3>
+            <p style="font-size:0.8rem; color:#888; margin-top:-10px;">参数仅保存在本地设备</p>
             <input type="password" id="gh-token" placeholder="GitHub Personal Access Token">
             <input type="text" id="gh-owner" placeholder="GitHub 用户名 (如 moodHappy)">
             <input type="text" id="gh-repo" placeholder="GitHub 仓库名 (如 Syntax-Lab)">
-            <button onclick="saveSettings()">💾 保存至本地设备</button>
+            <button onclick="saveSettings()">💾 保存至本地</button>
         </div>
     </div>
 
@@ -184,17 +188,16 @@ def generate_index():
         
         function renderCalendar() {
             daysGrid.innerHTML = '';
-            // 获取当月第一天是星期几，将其转换为 1(周一) 到 7(周日)
             let firstDay = new Date(sY, sM - 1, 1).getDay();
             if (firstDay === 0) firstDay = 7;
             
             const daysInMonth = new Date(sY, sM, 0).getDate();
             
-            // 填充空白格子
             for(let i=1; i<firstDay; i++) {
                 daysGrid.innerHTML += '<div class="day-cell empty"></div>';
             }
             
+            // 重点修复：现在从 archiveData 取出来的是完美匹配的纯数字键值
             const monthData = (archiveData[sY] && archiveData[sY][sM]) || {};
             for(let d=1; d<=daysInMonth; d++) {
                 const hasNews = monthData[d] && monthData[d].length > 0;
@@ -233,21 +236,21 @@ def generate_index():
 
         // --- 2. 配置管理 ---
         function saveSettings() {
-            localStorage.setItem('GH_TOKEN', document.getElementById('gh-token').value);
-            localStorage.setItem('GH_OWNER', document.getElementById('gh-owner').value);
-            localStorage.setItem('GH_REPO', document.getElementById('gh-repo').value);
+            localStorage.setItem('GH_TOKEN', document.getElementById('gh-token').value.trim());
+            localStorage.setItem('GH_OWNER', document.getElementById('gh-owner').value.trim());
+            localStorage.setItem('GH_REPO', document.getElementById('gh-repo').value.trim());
             document.getElementById('modal').style.display = 'none';
         }
         document.getElementById('gh-token').value = localStorage.getItem('GH_TOKEN') || '';
-        document.getElementById('gh-owner').value = localStorage.getItem('GH_OWNER') || 'moodHappy';
-        document.getElementById('gh-repo').value = localStorage.getItem('GH_REPO') || 'Syntax-Lab';
+        document.getElementById('gh-owner').value = localStorage.getItem('GH_OWNER') || '';
+        document.getElementById('gh-repo').value = localStorage.getItem('GH_REPO') || '';
 
         // --- 3. 生成自包含的 HTML 结构并推送 ---
         async function pushToGitHub() {
             const token = localStorage.getItem('GH_TOKEN');
             const owner = localStorage.getItem('GH_OWNER');
             const repo = localStorage.getItem('GH_REPO');
-            if(!token || !owner || !repo) return alert("请先点击右上角齿轮配置 GitHub 参数！");
+            if(!token || !owner || !repo) return alert("配置缺失！请先点击主页右上角齿轮，填写你的 GitHub Token、用户名和仓库名！");
             
             const original = document.getElementById('in-original').value.trim();
             const analysis = document.getElementById('in-analysis').value.trim();
@@ -259,14 +262,18 @@ def generate_index():
             if (original.length > 25) autoTitle += '...';
             
             const btn = document.getElementById('pushBtn');
-            btn.innerText = "⏳ 上传打包中..."; btn.disabled = true;
+            btn.innerText = "⏳ 跨海直推中..."; btn.disabled = true;
             
-            // 组装带自修改逻辑的极客模板
             const targetHtml = generateTemplate(autoTitle, original, analysis);
             
             const now = new Date();
-            const y = now.getFullYear(), m = String(now.getMonth()+1), d = String(now.getDate());
-            const h = String(now.getHours()).padStart(2,'0'), mn = String(now.getMinutes()).padStart(2,'0');
+            const y = now.getFullYear();
+            const m = String(now.getMonth()+1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const h = String(now.getHours()).padStart(2, '0');
+            const mn = String(now.getMinutes()).padStart(2, '0');
+            
+            // 路径绝对规范：按年/月建文件夹
             const filePath = `docs/${y}/${m}/${y}_${m}_${d}_${h}${mn}.html`;
             
             try {
@@ -274,27 +281,25 @@ def generate_index():
                     method: 'PUT',
                     headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        message: `Matrix Update: ${autoTitle}`,
+                        message: `Matrix Record: ${autoTitle}`,
                         content: btoa(unescape(encodeURIComponent(targetHtml)))
                     })
                 });
                 
                 if(res.ok) {
-                    alert("🎉 推送成功！云端打工人正在重新编译日历...");
+                    alert("🎉 矩阵记录成功！GitHub 云端流水线已启动，请等待几秒钟让日历自动刷新！");
                     document.getElementById('in-original').value = '';
                     document.getElementById('in-analysis').value = '';
-                    // 自动滑回第一页
                     document.getElementById('viewport').scrollTo({ left: 0, behavior: 'smooth' });
                 } else {
                     const err = await res.json();
-                    alert("❌ 失败: " + err.message);
+                    alert("❌ 失败: " + err.message + "\\n请检查你的 Token 是否具有 repo 权限！");
                 }
             } catch(e) { alert("网络错误: " + e.message); }
             
             btn.innerText = "🚀 推送至云端矩阵"; btn.disabled = false;
         }
 
-        // 超强独立模板生成器（修复了 script 解析拦截 BUG）
         function generateTemplate(title, orig, anal) {
             const safeOrig = orig.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             const safeAnal = anal.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -341,11 +346,9 @@ def generate_index():
     <div class="container">
         <div class="nav-back"><a href="../../index.html">🔙 返回矩阵枢纽</a></div>
         
-        <!-- 存储原始数据的脚本块（绝对安全隔离） -->
         <script id="raw-original" type="text/markdown">${safeOrig}</scr` + `ipt>
         <script id="raw-analysis" type="text/markdown">${safeAnal}</scr` + `ipt>
 
-        <!-- 原文区块 -->
         <div class="card" id="block-original">
             <div class="card-header"><span>📖 原始文本 (Original)</span> <span style="font-size:0.75rem; background:#eee; padding:2px 8px; border-radius:10px;">双指轻触编辑</span></div>
             <div id="view-original" class="view-mode markdown-body"></div>
@@ -356,7 +359,6 @@ def generate_index():
             </div>
         </div>
 
-        <!-- 深度分析区块 -->
         <div class="card" id="block-analysis">
             <div class="card-header"><span>🔬 深度解构 (Analysis)</span> <span style="font-size:0.75rem; background:#eee; padding:2px 8px; border-radius:10px;">双指轻触编辑</span></div>
             <div id="view-analysis" class="view-mode markdown-body"></div>
@@ -369,24 +371,18 @@ def generate_index():
     </div>
 
     <script>
-        // 初始化渲染
         function renderAll() {
             document.getElementById('view-original').innerHTML = marked.parse(document.getElementById('raw-original').textContent);
             document.getElementById('view-analysis').innerHTML = marked.parse(document.getElementById('raw-analysis').textContent);
         }
         renderAll();
 
-        // 监听双指触摸或双击触发编辑
         ['original', 'analysis'].forEach(target => {
             const viewBlock = document.getElementById('view-' + target);
-            
-            // 桌面端双击
             viewBlock.addEventListener('dblclick', () => triggerEdit(target));
-            
-            // 移动端双指轻触
             let lastTap = 0;
             viewBlock.addEventListener('touchstart', e => {
-                if (e.touches.length === 2) triggerEdit(target); // 真正的双指触摸
+                if (e.touches.length === 2) triggerEdit(target); 
             });
         });
 
@@ -406,14 +402,11 @@ def generate_index():
             const btn = document.querySelector('#edit-' + target + ' .save-btn');
             btn.innerText = '📡 正在同步...';
             
-            // 更新脚本标签中的原始数据
             const newContent = document.getElementById('textarea-' + target).value;
             document.getElementById('raw-' + target).textContent = newContent;
             
-            // 获取最新全页 HTML
             const newHtml = "<!DOCTYPE html>\\n<html lang=\\"zh-CN\\">\\n" + document.documentElement.innerHTML + "\\n</html>";
             
-            // 从 localStorage 读取 Token (与枢纽同域，安全共享)
             const token = localStorage.getItem('GH_TOKEN');
             const owner = localStorage.getItem('GH_OWNER');
             const repo = localStorage.getItem('GH_REPO');
@@ -424,36 +417,31 @@ def generate_index():
                 return;
             }
 
-            // 获取当前文件在 GitHub 的相对路径
             const path = window.location.pathname;
             const fileRelPath = path.substring(path.indexOf('docs/'));
             
             try {
-                // 1. 获取文件当前 SHA
                 const getRes = await fetch(\`https://api.github.com/repos/\${owner}/\${repo}/contents/\${fileRelPath}\`, {
                     headers: { 'Authorization': \`token \${token}\` }
                 });
                 const fileData = await getRes.json();
                 
-                // 2. 提交更新覆盖
                 const putRes = await fetch(\`https://api.github.com/repos/\${owner}/\${repo}/contents/\${fileRelPath}\`, {
                     method: 'PUT',
                     headers: { 'Authorization': \`token \${token}\`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        message: \`Update \${target} analysis via double-tap\`,
+                        message: \`Update \${target} analysis via UI\`,
                         content: btoa(unescape(encodeURIComponent(newHtml))),
                         sha: fileData.sha
                     })
                 });
                 
                 if(putRes.ok) {
-                    // 更新成功，退出编辑模式并重新渲染
                     cancelEdit(target);
                     renderAll();
-                    alert("✅ 云端同步成功！这篇讲义已被永久更新。");
+                    alert("✅ 云端同步成功！页面已刷新。");
                 } else {
-                    const err = await putRes.json();
-                    alert("同步失败: " + err.message);
+                    alert("同步失败，请检查网络或 Token 权限。");
                 }
             } catch(e) {
                 alert("发生错误: " + e.message);
