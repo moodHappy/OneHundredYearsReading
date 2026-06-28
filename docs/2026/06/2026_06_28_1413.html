@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A heavy gypsy with an unt...</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: #2980b9; --highlight: #fef9e7; }
+        body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; padding-bottom: 50px;}
+        .nav-back { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
+        .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .sync-status { font-size: 0.85rem; color: #27ae60; font-weight: bold; display: none; }
+        
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; font-weight: bold;}
+        
+        /* 极致紧凑的 Markdown 渲染样式 */
+        .markdown-body { font-size: 1.05rem; line-height: 1.6; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
+        .markdown-body h3 { font-size: 1.15rem; }
+        .markdown-body p { margin-top: 0; margin-bottom: 8px; }
+        
+        /* 消除松散列表造成的巨大空隙 */
+        .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 8px; padding-left: 20px; }
+        .markdown-body li { margin-bottom: 4px; }
+        .markdown-body li p { margin: 0; } 
+        
+        /* 自动隐藏因多敲回车产生的纯空白行 */
+        .markdown-body p:empty { display: none; } 
+        .markdown-body br + br { display: none; } 
+        
+        .markdown-body blockquote { margin: 0 0 10px 0; padding: 10px 15px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.1rem; border-radius: 0 8px 8px 0; }
+        .markdown-body blockquote p { margin-bottom: 0; }
+        .markdown-body hr { border: 0; border-top: 1px dashed #bdc3c7; margin: 15px 0; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.95rem; }
+        .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+        .markdown-body th { background: #f8f9fa; color: var(--accent); }
+        
+        /* 无痕静默编辑区 */
+        .edit-textarea { width: 100%; min-height: 250px; padding: 15px; font-family: monospace; font-size: 1.05rem; border: 2px solid var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; display: none; background: #fff; color: #2c3e50; line-height: 1.5; outline: none; box-shadow: 0 4px 15px rgba(41,128,185,0.1);}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="../../index.html">🔙 返回矩阵枢纽</a>
+            <span class="sync-status" id="sync-status">📡 同步中...</span>
+        </div>
+        
+        <textarea id="raw-original" style="display:none;">A heavy gypsy with an untamed beard and sparrow hands, who introduced himself as Melquíades, put on a bold public demonstration he himself called the eighth wonder of the learned alchemists of Macedonia.</textarea>
+        <textarea id="raw-analysis" style="display:none;"># 📌 要点汇总（适合课堂板书）
+
+- 一位“体型沉重的吉普赛人”登场  
+- 他留着“未修剪的胡须”，双手被比喻为“麻雀的爪子”  
+- 他自称为 Melquíades（梅尔基亚德斯）  
+- 他进行了一场公开展示（演示）  
+- 他将自己的表演称为“马其顿博学炼金术士的第八大奇迹”  
+- 语气夸张，带有自我神话化与神秘色彩  
+
+---
+
+# 📘 英语教学式讲解（逐句拆解）
+
+## 1. A heavy gypsy
+- **A heavy gypsy**：一个体型沉重/健壮的吉普赛人  
+- heavy 在这里不是“重”，而是：
+  - 体态厚重、结实、存在感强  
+- 语义氛围：
+  - 强化人物的“现实重量感 + 神秘感”
+
+---
+
+## 2. with an untamed beard and sparrow hands
+- **with + 名词短语**：伴随特征补充  
+- **an untamed beard**
+  - untamed：未驯服的 / 未修剪的  
+  - 强调野性、自然状态  
+- **sparrow hands**
+  - 比喻（隐喻结构）  
+  - sparrow = 麻雀  
+  - 表示手细小、干瘦、灵巧或骨感  
+
+📌 语义对比：
+- 胡须：粗野、扩张  
+- 手：细小、敏捷  
+→ 形成强烈身体对照
+
+---
+
+## 3. who introduced himself as Melquíades
+- **who introduced himself as…**
+  - 定语从句修饰前面的“gypsy”  
+  - introduce oneself as：自称为……  
+- **Melquíades**
+  - 专有名词（人物身份正式登场）  
+
+📌 语义重点：
+- “自我命名”行为本身具有象征意义  
+- 暗示其身份带有神秘或传奇色彩  
+
+---
+
+## 4. put on a bold public demonstration
+- **put on**：上演 / 举行（表演类动词）  
+- **bold**：大胆的 / 夸张的  
+- **public demonstration**：
+  - 公共展示 / 公开实验 / 表演式演示  
+
+📌 语义重点：
+- 科学 + 表演 + 神秘仪式的混合体  
+- 不只是实验，而是“展示行为”
+
+---
+
+## 5. he himself called
+- **he himself**：强调主语（他本人）  
+- 强调“定义权在他自己手中”  
+- 语气：强调自我叙述 / 自我解释  
+
+---
+
+## 6. the eighth wonder of the learned alchemists of Macedonia
+这是整句的核心修辞结构
+
+### 分解：
+
+- **the eighth wonder**
+  - “第八大奇迹”  
+  - 超越“世界七大奇迹”的夸张表达  
+
+- **of the learned alchemists**
+  - learned：博学的  
+  - alchemists：炼金术士  
+  - 表示古代“科学 + 神秘学”混合传统  
+
+- **of Macedonia**
+  - 地域修饰，赋予历史/异域色彩  
+  - Macedonia（马其顿）在语境中带有古典与传奇象征  
+
+📌 整体语义：
+- 一个自我神话化的夸张称号  
+- 科学展示被包装成“古代炼金术奇迹”  
+
+---
+
+# 📚 整句文学效果（课堂总结）
+
+- 人物 Melquíades 被塑造成：
+  - 身体上粗野 + 神秘  
+  - 身份上自我定义 + 传奇化  
+- “科学展示”被转化为：
+  - 仪式  
+  - 奇迹  
+  - 神秘炼金术表演  
+- 核心风格：
+  - 现实人物 + 夸张修辞 + 神秘历史包装  
+- 强化《百年孤独》的典型风格：
+  - 魔幻现实主义 = 科学 + 神话 + 表演性叙事  
+
+---
+
+# 📌 Key Expressions（板书 / Anki）
+
+- untamed beard —— 未修剪的胡须  
+- sparrow hands —— 麻雀般的手（细小/骨感）  
+- introduce oneself as —— 自称为  
+- put on a demonstration —— 进行展示  
+- bold public demonstration —— 大胆的公开演示  
+- the eighth wonder —— 第八大奇迹  
+- learned alchemists —— 博学炼金术士  
+- self-mythologizing —— 自我神话化（隐含概念）</textarea>
+
+        <div class="card">
+            <div class="card-header">📖 原始文本 (Original)</div>
+            <div id="view-original" class="markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;"></div>
+        </div>
+
+        <div class="card" id="block-analysis">
+            <div class="card-header">🔬 深度解构 (Analysis)</div>
+            <div id="view-analysis" class="markdown-body"></div>
+            <textarea id="edit-analysis" class="edit-textarea"></textarea>
+        </div>
+    </div>
+
+    <script>
+        const GH_OWNER = "moodHappy";
+        const GH_REPO = "OneHundredYearsReading";
+
+        function renderAll() {
+            document.getElementById('view-original').textContent = document.getElementById('raw-original').value;
+            const analContent = document.getElementById('raw-analysis').value;
+            
+            try {
+                if (typeof marked !== 'undefined') {
+                    document.getElementById('view-analysis').innerHTML = marked.parse(analContent);
+                }
+            } catch(e) { console.error("Markdown failed", e); }
+        }
+        window.onload = renderAll;
+
+        const viewBlock = document.getElementById('view-analysis');
+        const editBlock = document.getElementById('edit-analysis');
+        const statusMsg = document.getElementById('sync-status');
+
+        viewBlock.addEventListener('dblclick', triggerEdit);
+        viewBlock.addEventListener('touchstart', e => {
+            if (e.touches.length === 2) triggerEdit(); 
+        });
+
+        function triggerEdit() {
+            viewBlock.style.display = 'none';
+            editBlock.style.display = 'block';
+            editBlock.value = document.getElementById('raw-analysis').value;
+            editBlock.focus();
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function reconstructSelfHTML(newAnal) {
+            const orig = document.getElementById('raw-original').value;
+            const safeOrig = escapeHTML(orig);
+            const safeAnal = escapeHTML(newAnal);
+            
+            const template = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+` + document.head.innerHTML + `
+</head>
+<body>
+` +
+            `    <div class="container">
+` +
+            `        <div class="nav-back">
+` +
+            `            <a href="../../index.html">🔙 返回矩阵枢纽</a>
+` +
+            `            <span class="sync-status" id="sync-status">📡 同步中...</span>
+` +
+            `        </div>
+
+` +
+            `        <textarea id="raw-original" style="display:none;">${safeOrig}</textarea>
+` +
+            `        <textarea id="raw-analysis" style="display:none;">${safeAnal}</textarea>
+
+` +
+            `        <div class="card">
+` +
+            `            <div class="card-header">📖 原始文本 (Original)</div>
+` +
+            `            <div id="view-original" class="markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;"></div>
+` +
+            `        </div>
+
+` +
+            `        <div class="card" id="block-analysis">
+` +
+            `            <div class="card-header">🔬 深度解构 (Analysis)</div>
+` +
+            `            <div id="view-analysis" class="markdown-body"></div>
+` +
+            `            <textarea id="edit-analysis" class="edit-textarea"></textarea>
+` +
+            `        </div>
+` +
+            `    </div>
+
+` +
+            `    <script>
+` + renderAll.toString() + `
+` +
+            `    window.onload = renderAll;
+` +
+            `    const viewBlock = document.getElementById('view-analysis');
+` +
+            `    const editBlock = document.getElementById('edit-analysis');
+` +
+            `    const statusMsg = document.getElementById('sync-status');
+` +
+            `    viewBlock.addEventListener('dblclick', triggerEdit);
+` +
+            `    viewBlock.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEdit(); });
+` +
+            `    ` + triggerEdit.toString() + `
+` +
+            `    ` + escapeHTML.toString() + `
+` +
+            `    ` + reconstructSelfHTML.toString() + `
+` +
+            `    const GH_OWNER = "${GH_OWNER}"; const GH_REPO = "${GH_REPO}";
+` +
+            `    editBlock.addEventListener('blur', ` + editBlock.onblur.toString() + `);
+` +
+            `    </scr` + `ipt>
+</body>
+</html>`;
+            return template;
+        }
+
+        editBlock.onblur = async function() {
+            const newText = editBlock.value.trim();
+            const oldText = document.getElementById('raw-analysis').value.trim();
+            
+            editBlock.style.display = 'none';
+            viewBlock.style.display = 'block';
+            
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-analysis').value = newText;
+                renderAll();
+                
+                const token = localStorage.getItem('GH_TOKEN');
+                if(!token) return;
+
+                statusMsg.style.display = 'block';
+                statusMsg.style.color = '#2980b9';
+                statusMsg.innerText = '📡 静默同步中...';
+                
+                const pureHtml = reconstructSelfHTML(newText);
+                const path = window.location.pathname;
+                const fileRelPath = path.substring(path.indexOf('docs/'));
+                
+                try {
+                    const utf8Encode = new TextEncoder().encode(pureHtml);
+                    const binaryString = String.fromCodePoint(...utf8Encode);
+                    const base64Html = btoa(binaryString);
+
+                    const getRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, {
+                        headers: { 'Authorization': `token ${token}` }
+                    });
+                    const fileData = await getRes.json();
+                    
+                    const putRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: `Auto-save analysis update`,
+                            content: base64Html,
+                            sha: fileData.sha
+                        })
+                    });
+                    
+                    if(putRes.ok) {
+                        statusMsg.style.color = '#27ae60';
+                        statusMsg.innerText = '✅ 云端已同步';
+                        setTimeout(() => statusMsg.style.display = 'none', 3000);
+                    } else {
+                        statusMsg.style.color = '#e74c3c';
+                        statusMsg.innerText = '❌ 同步失败';
+                    }
+                } catch(e) {
+                    statusMsg.style.color = '#e74c3c';
+                    statusMsg.innerText = '❌ 网络断开';
+                }
+            }
+        };
+        editBlock.addEventListener('blur', editBlock.onblur);
+
+    </script>
+</body>
+</html>
