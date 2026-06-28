@@ -87,7 +87,7 @@
             <div class="container">
                 <div class="header">
                     <h1>Deconstruct</h1>
-                    <p>将复杂的长难句拆解至最小单元</p>
+                    <p>目标仓库: OneHundredYearsReading</p>
                 </div>
                 <div class="form-group">
                     <label>原文 (Original Text)</label>
@@ -106,18 +106,15 @@
     <div class="modal" id="modal">
         <div class="modal-content">
             <h3 style="margin-top:0; color:#2c3e50;">配置核心 Token</h3>
-            <p style="font-size:0.8rem; color:#888; margin-top:-10px;">参数仅保存在本地设备</p>
-            <input type="password" id="gh-token" placeholder="GitHub Personal Access Token">
-            <input type="text" id="gh-owner" placeholder="GitHub 用户名 (如 moodHappy)">
-            <input type="text" id="gh-repo" placeholder="GitHub 仓库名 (如 Syntax-Lab)">
+            <p style="font-size:0.8rem; color:#888; margin-top:-10px;">仅需 Token，仓库已自动锁定！</p>
+            <input type="password" id="gh-token" placeholder="输入你的 GitHub Token">
             <button onclick="saveSettings()">💾 保存至本地</button>
         </div>
     </div>
 
     <script>
-        // --- 初始化自动检查 Token ---
         window.onload = function() {
-            if (!localStorage.getItem('GH_TOKEN') || !localStorage.getItem('GH_REPO')) {
+            if (!localStorage.getItem('GH_TOKEN')) {
                 document.getElementById('modal').style.display = 'flex';
             }
         };
@@ -125,6 +122,10 @@
         const archiveData = {};
         const today = new Date();
         let sY = today.getFullYear(), sM = today.getMonth() + 1, sD = today.getDate();
+        
+        // --- 强制写死目标仓库 ---
+        const GH_OWNER = "moodHappy";
+        const GH_REPO = "OneHundredYearsReading";
         
         const yearSelect = document.getElementById('yearSelect');
         const monthSelect = document.getElementById('monthSelect');
@@ -188,19 +189,22 @@
 
         function saveSettings() {
             localStorage.setItem('GH_TOKEN', document.getElementById('gh-token').value.trim());
-            localStorage.setItem('GH_OWNER', document.getElementById('gh-owner').value.trim());
-            localStorage.setItem('GH_REPO', document.getElementById('gh-repo').value.trim());
             document.getElementById('modal').style.display = 'none';
         }
         document.getElementById('gh-token').value = localStorage.getItem('GH_TOKEN') || '';
-        document.getElementById('gh-owner').value = localStorage.getItem('GH_OWNER') || '';
-        document.getElementById('gh-repo').value = localStorage.getItem('GH_REPO') || '';
+
+        // 字符转义，保证文本域数据绝对安全，不会截断任何符号
+        function escapeHTML(str) {
+            return str.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&#039;');
+        }
 
         async function pushToGitHub() {
             const token = localStorage.getItem('GH_TOKEN');
-            const owner = localStorage.getItem('GH_OWNER');
-            const repo = localStorage.getItem('GH_REPO');
-            if(!token || !owner || !repo) {
+            if(!token) {
                 document.getElementById('modal').style.display='flex';
                 return;
             }
@@ -216,6 +220,7 @@
             const btn = document.getElementById('pushBtn');
             btn.innerText = "⏳ 跨海直推中..."; btn.disabled = true;
             
+            // 使用原生方式生成模板，不加密，不转码，原生最稳！
             const targetHtml = generateTemplate(autoTitle, original, analysis);
             
             const now = new Date();
@@ -228,33 +233,38 @@
             const filePath = `docs/${y}/${m}/${y}_${m}_${d}_${h}${mn}.html`;
             
             try {
-                const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+                // btoa 需要将 Unicode 转换为 Latin1 以免报错
+                const utf8Encode = new TextEncoder().encode(targetHtml);
+                const binaryString = String.fromCodePoint(...utf8Encode);
+                const base64Html = btoa(binaryString);
+
+                const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${filePath}`, {
                     method: 'PUT',
                     headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        message: `Matrix Record: ${autoTitle}`,
-                        content: btoa(unescape(encodeURIComponent(targetHtml)))
+                        message: `Syntax Matrix Record: ${autoTitle}`,
+                        content: base64Html
                     })
                 });
                 
                 if(res.ok) {
-                    alert("🎉 矩阵记录成功！云端流水线已启动，日历将在稍后自动刷新！");
+                    alert("🎉 记录成功！日历将在几秒后通过 Action 自动刷新。");
                     document.getElementById('in-original').value = '';
                     document.getElementById('in-analysis').value = '';
                     document.getElementById('viewport').scrollTo({ left: 0, behavior: 'smooth' });
                 } else {
                     const err = await res.json();
-                    alert("❌ 失败: " + err.message + "\n请检查你的 Token 是否具有 repo 权限！");
+                    alert("❌ 失败: " + err.message);
                 }
             } catch(e) { alert("网络错误: " + e.message); }
             
             btn.innerText = "🚀 推送至云端矩阵"; btn.disabled = false;
         }
 
-        // 终极防崩溃：采用隐藏的 JSON Base64 数据桥接生成独立页面
+        // 终极防崩溃：利用原生 textarea 保存原始数据，极度安全，解析零失误！
         function generateTemplate(title, orig, anal) {
-            const dataObj = { title: title, orig: orig, anal: anal };
-            const b64Data = btoa(unescape(encodeURIComponent(JSON.stringify(dataObj))));
+            const safeOrig = escapeHTML(orig);
+            const safeAnal = escapeHTML(anal);
             
             return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -283,7 +293,7 @@
         .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 12px; text-align: left; }
         .markdown-body th { background: #f8f9fa; color: var(--accent); }
         
-        /* 编辑模式交互 */
+        /* 交互反馈 - 完全隐藏任何编辑提示符，打造干净的网页 */
         .view-mode.editing { display: none; }
         .edit-mode { display: none; }
         .edit-mode.active { display: block; }
@@ -297,7 +307,8 @@
     <div class="container">
         <div class="nav-back"><a href="../../index.html">🔙 返回矩阵枢纽</a></div>
         
-        <script id="page-data" type="application/base64">${b64Data}</scr` + `ipt>
+        <textarea id="raw-original" style="display:none;">${safeOrig}</textarea>
+        <textarea id="raw-analysis" style="display:none;">${safeAnal}</textarea>
 
         <div class="card" id="block-original">
             <div class="card-header">📖 原始文本 (Original)</div>
@@ -318,26 +329,28 @@
     </div>
 
     <script>
-        // 解析底层数据
-        let pageData = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('page-data').textContent))));
+        const GH_OWNER = "moodHappy";
+        const GH_REPO = "OneHundredYearsReading";
 
         function renderAll() {
-            document.getElementById('view-original').textContent = pageData.orig;
+            // 原文保留换行，分析使用 marked.js 渲染 Markdown
+            document.getElementById('view-original').textContent = document.getElementById('raw-original').value;
+            const analContent = document.getElementById('raw-analysis').value;
+            
             if (typeof marked !== 'undefined') {
-                document.getElementById('view-analysis').innerHTML = marked.parse(pageData.anal);
+                document.getElementById('view-analysis').innerHTML = marked.parse(analContent);
             } else {
-                document.getElementById('view-analysis').innerHTML = "<pre style='white-space:pre-wrap;'>" + pageData.anal + "</pre>";
+                document.getElementById('view-analysis').innerHTML = "<pre style='white-space:pre-wrap;'>" + analContent + "</pre>";
             }
         }
         window.onload = renderAll;
 
-        // 仅对分析区块赋予双指/双击魔法
+        // 仅对分析区块赋予双指/双击魔法，没有任何碍眼的标签
         const viewBlock = document.getElementById('view-analysis');
         const editBlock = document.getElementById('edit-analysis');
         const textarea = document.getElementById('textarea-analysis');
 
         viewBlock.addEventListener('dblclick', triggerEdit);
-        let lastTap = 0;
         viewBlock.addEventListener('touchstart', e => {
             if (e.touches.length === 2) triggerEdit(); 
         });
@@ -345,7 +358,7 @@
         function triggerEdit() {
             viewBlock.classList.add('editing');
             editBlock.classList.add('active');
-            textarea.value = pageData.anal;
+            textarea.value = document.getElementById('raw-analysis').value;
         }
 
         function cancelEdit() {
@@ -353,24 +366,30 @@
             editBlock.classList.remove('active');
         }
 
+        // 文本域防转义方法
+        function encodeHTML(str) {
+            return str.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&#039;');
+        }
+
         async function saveEdit() {
             const btn = document.querySelector('.save-btn');
             btn.innerText = '📡 正在覆盖...';
             
-            // 提取新内容并更新底层保险箱
-            pageData.anal = textarea.value;
-            document.getElementById('page-data').textContent = btoa(unescape(encodeURIComponent(JSON.stringify(pageData))));
+            const newText = textarea.value;
+            // 更新隐藏文本域的内容
+            document.getElementById('raw-analysis').value = newText;
+            document.getElementById('raw-analysis').innerHTML = encodeHTML(newText);
             
-            // 恢复视图
             cancelEdit();
             renderAll();
             
             const newHtml = "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n" + document.documentElement.innerHTML + "\n</html>";
             
             const token = localStorage.getItem('GH_TOKEN');
-            const owner = localStorage.getItem('GH_OWNER');
-            const repo = localStorage.getItem('GH_REPO');
-            
             if(!token) {
                 alert("未检测到 GitHub Token。请回主页枢纽点击齿轮配置！");
                 btn.innerText = '💾 保存并更新云端';
@@ -381,23 +400,28 @@
             const fileRelPath = path.substring(path.indexOf('docs/'));
             
             try {
-                const getRes = await fetch(\`https://api.github.com/repos/\${owner}/\${repo}/contents/\${fileRelPath}\`, {
+                // btoa 乱码终极解决方案：使用 TextEncoder
+                const utf8Encode = new TextEncoder().encode(newHtml);
+                const binaryString = String.fromCodePoint(...utf8Encode);
+                const base64Html = btoa(binaryString);
+
+                const getRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
                     headers: { 'Authorization': \`token \${token}\` }
                 });
                 const fileData = await getRes.json();
                 
-                const putRes = await fetch(\`https://api.github.com/repos/\${owner}/\${repo}/contents/\${fileRelPath}\`, {
+                const putRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
                     method: 'PUT',
                     headers: { 'Authorization': \`token \${token}\`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         message: \`Update analysis via UI\`,
-                        content: btoa(unescape(encodeURIComponent(newHtml))),
+                        content: base64Html,
                         sha: fileData.sha
                     })
                 });
                 
                 if(putRes.ok) {
-                    alert("✅ 云端同步成功！页面已被永久更新。");
+                    alert("✅ 云端同步成功！这篇精读讲义已被永久更新。");
                 } else {
                     const err = await putRes.json();
                     alert("同步失败: " + err.message);
