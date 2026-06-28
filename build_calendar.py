@@ -1,177 +1,476 @@
-import requests
-import base64
-import datetime
+import os
 import json
 import re
 
-# ==========================================
-# ⚙️ 配置区：请在此处填入你的信息
-# ==========================================
-GITHUB_TOKEN = ""  # 留空：请在本地手动填写你的 GitHub Personal Access Token
-REPO_NAME = "你的用户名/你的仓库名"  # 例如: "moodHappy/syntax-calendar"
-BRANCH = "main"    # 你的默认分支名称
-# ==========================================
+BASE_DIR = "docs"
 
-def upload_to_github(path, content, message):
-    """通过 GitHub API 上传文件到指定路径"""
-    if not GITHUB_TOKEN or not REPO_NAME or "你的用户名" in REPO_NAME:
-        print("❌ 拦截：请先在脚本顶部配置 GITHUB_TOKEN 和 REPO_NAME")
-        return False
-
-    url = f"https://api.github.com/repos/{REPO_NAME}/contents/{path}"
-    headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github.v3+json"
-    }
-
-    # 1. 查询文件是否已存在（为了获取 SHA 以覆盖旧文件）
-    r_get = requests.get(url, headers=headers)
-    sha = r_get.json().get("sha") if r_get.status_code == 200 else None
-
-    # 2. 构建推送数据 (内容必须是 Base64 编码)
-    data = {
-        "message": message,
-        "content": base64.b64encode(content.encode('utf-8')).decode('utf-8'),
-        "branch": BRANCH
-    }
-    if sha:
-        data["sha"] = sha
-
-    # 3. 执行推送
-    r_put = requests.put(url, headers=headers, json=data)
-    if r_put.status_code in (200, 201):
-        print(f"✅ 成功推送到仓库: {path}")
-        return True
-    else:
-        print(f"❌ 推送失败 {path}: {r_put.json()}")
-        return False
-
-def build_calendar_index():
-    """从远程仓库抓取结构，生成并推送日历索引 index.html"""
-    print("🔍 正在拉取仓库最新的文件树...")
-    tree_url = f"https://api.github.com/repos/{REPO_NAME}/git/trees/{BRANCH}?recursive=1"
-    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
-
-    r = requests.get(tree_url, headers=headers)
-    if r.status_code != 200:
-        print(f"❌ 获取文件树失败: {r.text}")
-        return
-
-    tree = r.json().get("tree", [])
-    html_files = []
+def generate_index():
+    os.makedirs(BASE_DIR, exist_ok=True)
     
-    # 严格匹配 docs/年份/月份/xxx.html 的结构
-    pattern = re.compile(r"^docs/(\d{4})/(\d{2})/(.*?\.html)$")
+    print("⚙️ 正在重新编译全栈语法枢纽...")
+    # 扫描归档目录，构建日历数据
+    archive_data = {}
+    years = [d for d in os.listdir(BASE_DIR) if d.isdigit()]
+    for year in years:
+        archive_data[year] = {}
+        months = [d for d in os.listdir(os.path.join(BASE_DIR, year)) if d.isdigit()]
+        for month in months:
+            archive_data[year][month] = {}
+            files = sorted([f for f in os.listdir(os.path.join(BASE_DIR, year, month)) if f.endswith('.html')], reverse=True)
+            for file in files:
+                try:
+                    parts = file.replace(".html", "").split('_')
+                    if len(parts) >= 4:
+                        day = parts[2]
+                        time_str = f"{parts[3][:2]}:{parts[3][2:]}"
+                        file_path = f"{year}/{month}/{file}"
+                        
+                        # 提取生成的 HTML 标题
+                        title = "📌 语法解构"
+                        with open(os.path.join(BASE_DIR, year, month, file), 'r', encoding='utf-8') as f_html:
+                            content = f_html.read(1500)
+                            start = content.find('<title>')
+                            end = content.find('</title>')
+                            if start != -1 and end != -1:
+                                title = content[start+7:end]
 
-    for item in tree:
-        match = pattern.match(item["path"])
-        if match and "index.html" not in item["path"]:
-            year, month, filename = match.groups()
-            html_files.append(f"{year}/{month}/{filename}")
+                        if day not in archive_data[year][month]:
+                            archive_data[year][month][day] = []
+                        archive_data[year][month][day].append({"time": time_str, "path": file_path, "title": title})
+                except: pass
 
-    # 按时间倒序排列（最新的在最上面）
-    html_files.sort(reverse=True)
+    json_data = json.dumps(archive_data)
 
-    # 动态生成包含日历 UI 的 HTML（数据以 JSON 格式注入 JS）
-    files_json = json.dumps(html_files)
-    index_content = f"""<!DOCTYPE html>
-<html lang="en">
+    # 包含滑动双屏、日历渲染和 GitHub API 提交流水线的终极前端
+    html_content = """<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Syntax Calendar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Syntax Matrix 枢纽</title>
     <style>
-        body {{ font-family: -apple-system, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; background: #f6f8fa; }}
-        .card {{ background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }}
-        h1 {{ border-bottom: 2px solid #eaecef; padding-bottom: 10px; color: #24292e; }}
-        .year-group {{ margin-top: 24px; color: #0366d6; border-left: 4px solid #0366d6; padding-left: 10px; }}
-        .month-group {{ margin-top: 16px; margin-left: 16px; color: #586069; font-size: 1.1em; }}
-        ul {{ list-style-type: none; padding-left: 20px; }}
-        li {{ margin: 8px 0; padding: 6px; background: #f1f8ff; border-radius: 4px; }}
-        a {{ color: #0366d6; text-decoration: none; display: block; }}
-        a:hover {{ text-decoration: underline; color: #005cc5; }}
+        :root { --bg: #f5f5f7; --primary: #2980b9; --accent: #f1c40f; --card: #ffffff; --border: #e0e0e0; --text: #333; }
+        body, html { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); height: 100%; overflow: hidden; }
+        
+        .viewport { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; height: 100vh; -webkit-overflow-scrolling: touch; }
+        .viewport::-webkit-scrollbar { display: none; }
+        .page { flex: 0 0 100vw; width: 100vw; height: 100vh; scroll-snap-align: start; overflow-y: auto; padding-bottom: 30px; box-sizing: border-box; }
+        
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; padding: 20px 0; border-bottom: 1px dashed var(--border); margin-bottom: 20px; position: relative; }
+        .header h1 { margin: 0 0 5px 0; font-size: 2rem; color: var(--primary); font-weight: 800; }
+        .header h1 span { color: #f39c12; }
+        .header p { margin: 0; font-size: 0.9rem; color: #7f8c8d; letter-spacing: 1px; }
+        .settings-btn { position: absolute; right: 0; top: 20px; background: none; border: none; font-size: 1.4rem; cursor: pointer; opacity: 0.8; }
+        
+        /* 日历样式 */
+        .controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .select-box { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-weight: bold; background: var(--card); color: var(--primary); }
+        .calendar-wrapper { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 13px; color: #888; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .day-cell { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-weight: bold; border-radius: 10px; position: relative; cursor: pointer; transition: all 0.2s; }
+        .day-cell.empty { visibility: hidden; }
+        .day-cell.has-news { color: var(--text); background: #fdfdfd; border: 1px solid #f5f5f5; }
+        .day-cell.no-news { color: #dcdde1; }
+        .day-cell.selected { background: #eaf2f8; color: var(--primary); border: 1px solid #3498db; }
+        .day-cell.today { background: #fff9e6; border: 1px solid #f1c40f; }
+        .dot { width: 5px; height: 5px; background: var(--primary); border-radius: 50%; position: absolute; bottom: 5px; display: none; }
+        .day-cell.has-news .dot { display: block; }
+        
+        .feed-list { display: flex; flex-direction: column; gap: 12px; }
+        .feed-item { background: var(--card); padding: 18px; border-radius: 12px; text-decoration: none; color: var(--text); border-left: 5px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 5px; transition: transform 0.2s; }
+        .feed-item:active { transform: scale(0.98); background: #fafafa; }
+        .feed-time { font-family: monospace; color: #7f8c8d; font-size: 0.85rem; }
+        .feed-title { font-weight: bold; font-size: 1.05rem; }
+        
+        /* 录入表单样式 */
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: var(--primary); font-size: 0.95rem; }
+        .form-control { width: 100%; box-sizing: border-box; padding: 15px; border: 1px solid var(--border); border-radius: 10px; font-size: 1rem; font-family: inherit; resize: vertical; background: var(--card); }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(41,128,185,0.1); }
+        textarea.form-control { min-height: 120px; line-height: 1.5; }
+        .btn-push { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 10px; font-size: 1.15rem; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(41,128,185,0.3); transition: background 0.2s; }
+        .btn-push:active { transform: scale(0.98); background: #2471a3; }
+        
+        /* 模态框 */
+        .modal { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(4px); }
+        .modal-content { background: #fff; padding: 25px; border-radius: 16px; width: 100%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .modal-content input { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
+        .modal-content button { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; }
+        
+        .page-indicator { text-align: center; color: #95a5a6; font-size: 0.85rem; padding: 15px; letter-spacing: 1px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>📚 Syntax Analysis Calendar</h1>
-        <div id="calendar-container"></div>
+    <div class="viewport" id="viewport">
+        <!-- 第一页：日历归档 -->
+        <div class="page" id="page-1">
+            <div class="container">
+                <div class="header">
+                    <h1><span>Syntax</span> Matrix</h1>
+                    <p>句子解构与语法实验室</p>
+                    <button class="settings-btn" onclick="document.getElementById('modal').style.display='flex'">⚙️</button>
+                </div>
+                <div class="controls">
+                    <select class="select-box" id="yearSelect"></select>
+                    <select class="select-box" id="monthSelect">
+                        <option value="1">01月</option><option value="2">02月</option><option value="3">03月</option>
+                        <option value="4">04月</option><option value="5">05月</option><option value="6">06月</option>
+                        <option value="7">07月</option><option value="8">08月</option><option value="9">09月</option>
+                        <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+                    </select>
+                </div>
+                <div class="calendar-wrapper">
+                    <div class="weekdays"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+                    <div class="days-grid" id="daysGrid"></div>
+                </div>
+                <div class="feed-list" id="feedList"></div>
+                <div class="page-indicator">← 向左滑动进入录入矩阵</div>
+            </div>
+        </div>
+        
+        <!-- 第二页：输入控制台 -->
+        <div class="page" id="page-2">
+            <div class="container">
+                <div class="header">
+                    <h1>Deconstruct</h1>
+                    <p>将复杂的长难句拆解至最小单元</p>
+                </div>
+                <div class="form-group">
+                    <label>原文 (Original Text)</label>
+                    <textarea id="in-original" class="form-control" placeholder="输入英语原句..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>教师级剖析 (Markdown Analysis)</label>
+                    <textarea id="in-analysis" class="form-control" style="min-height: 280px;" placeholder="支持 Markdown 语法。例如：\n\n### 句子核心意思\n...\n\n### 句子结构分析\n> 引用原文\n..."></textarea>
+                </div>
+                <button class="btn-push" id="pushBtn" onclick="pushToGitHub()">🚀 推送至云端矩阵</button>
+                <div class="page-indicator" style="margin-top: 20px;">向右滑动返回日历枢纽 →</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗配置 -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:#2c3e50;">配置核心 Token</h3>
+            <input type="password" id="gh-token" placeholder="GitHub Personal Access Token">
+            <input type="text" id="gh-owner" placeholder="GitHub 用户名 (如 moodHappy)">
+            <input type="text" id="gh-repo" placeholder="GitHub 仓库名 (如 Syntax-Lab)">
+            <button onclick="saveSettings()">💾 保存至本地设备</button>
+        </div>
     </div>
 
     <script>
-        const files = {files_json};
-        const container = document.getElementById('calendar-container');
+        // --- 1. 日历渲染逻辑 ---
+        const archiveData = REPLACEME_JSON_DATA;
+        const today = new Date();
+        let sY = today.getFullYear(), sM = today.getMonth() + 1, sD = today.getDate();
+        
+        const yearSelect = document.getElementById('yearSelect');
+        const monthSelect = document.getElementById('monthSelect');
+        const daysGrid = document.getElementById('daysGrid');
+        
+        function initSelects() {
+            const years = Object.keys(archiveData).map(Number).sort((a,b)=>b-a);
+            if(!years.includes(sY)) years.unshift(sY);
+            years.forEach(y => {
+                const opt = document.createElement('option'); opt.value = y; opt.textContent = y + '年';
+                yearSelect.appendChild(opt);
+            });
+            yearSelect.value = sY; monthSelect.value = sM;
+        }
+        
+        function renderCalendar() {
+            daysGrid.innerHTML = '';
+            // 获取当月第一天是星期几，将其转换为 1(周一) 到 7(周日)
+            let firstDay = new Date(sY, sM - 1, 1).getDay();
+            if (firstDay === 0) firstDay = 7;
+            
+            const daysInMonth = new Date(sY, sM, 0).getDate();
+            
+            // 填充空白格子
+            for(let i=1; i<firstDay; i++) {
+                daysGrid.innerHTML += '<div class="day-cell empty"></div>';
+            }
+            
+            const monthData = (archiveData[sY] && archiveData[sY][sM]) || {};
+            for(let d=1; d<=daysInMonth; d++) {
+                const hasNews = monthData[d] && monthData[d].length > 0;
+                const isToday = sY === today.getFullYear() && sM === today.getMonth()+1 && d === today.getDate();
+                const isSelected = d === sD;
+                
+                let classes = 'day-cell';
+                if(hasNews) classes += ' has-news'; else classes += ' no-news';
+                if(isToday) classes += ' today';
+                if(isSelected) classes += ' selected';
+                
+                const cell = document.createElement('div');
+                cell.className = classes;
+                cell.innerHTML = d + `<div class="dot" style="display:${hasNews?'block':'none'}"></div>`;
+                cell.onclick = () => { sD = d; renderCalendar(); renderList(); };
+                daysGrid.appendChild(cell);
+            }
+        }
+        
+        function renderList() {
+            const list = document.getElementById('feedList');
+            const data = (archiveData[sY] && archiveData[sY][sM] && archiveData[sY][sM][sD]) || [];
+            if(data.length) {
+                list.innerHTML = data.map(item => `<a href="${item.path}" class="feed-item"><span class="feed-title">${item.title}</span><span class="feed-time">${item.time} 录入</span></a>`).join('');
+            } else {
+                list.innerHTML = '<div style="text-align:center; padding: 30px 20px; color:#bdc3c7; border: 1px dashed #e0e0e0; border-radius: 12px;">当日无解构档案</div>';
+            }
+        }
+        
+        yearSelect.onchange = e => { sY = parseInt(e.target.value); renderCalendar(); renderList(); };
+        monthSelect.onchange = e => { sM = parseInt(e.target.value); renderCalendar(); renderList(); };
+        
+        initSelects(); 
+        renderCalendar(); 
+        renderList();
 
-        if(files.length === 0) {{
-            container.innerHTML = '<p>暂无语法分析记录。</p>';
-        }} else {{
-            let currentYear = '';
-            let currentMonth = '';
-            let html = '';
+        // --- 2. 配置管理 ---
+        function saveSettings() {
+            localStorage.setItem('GH_TOKEN', document.getElementById('gh-token').value);
+            localStorage.setItem('GH_OWNER', document.getElementById('gh-owner').value);
+            localStorage.setItem('GH_REPO', document.getElementById('gh-repo').value);
+            document.getElementById('modal').style.display = 'none';
+        }
+        document.getElementById('gh-token').value = localStorage.getItem('GH_TOKEN') || '';
+        document.getElementById('gh-owner').value = localStorage.getItem('GH_OWNER') || 'moodHappy';
+        document.getElementById('gh-repo').value = localStorage.getItem('GH_REPO') || 'Syntax-Lab';
 
-            files.forEach(path => {{
-                const parts = path.split('/');
-                const year = parts[0];
-                const month = parts[1];
-                const filename = decodeURIComponent(parts[2]);
+        // --- 3. 生成自包含的 HTML 结构并推送 ---
+        async function pushToGitHub() {
+            const token = localStorage.getItem('GH_TOKEN');
+            const owner = localStorage.getItem('GH_OWNER');
+            const repo = localStorage.getItem('GH_REPO');
+            if(!token || !owner || !repo) return alert("请先点击右上角齿轮配置 GitHub 参数！");
+            
+            const original = document.getElementById('in-original').value.trim();
+            const analysis = document.getElementById('in-analysis').value.trim();
+            
+            if(!original || !analysis) return alert("原文和分析均不能为空！");
+            
+            // 自动从原文提取标题（取前25个字符）
+            let autoTitle = original.substring(0, 25).replace(/\\n/g, ' ');
+            if (original.length > 25) autoTitle += '...';
+            
+            const btn = document.getElementById('pushBtn');
+            btn.innerText = "⏳ 上传打包中..."; btn.disabled = true;
+            
+            // 组装带自修改逻辑的极客模板
+            const targetHtml = generateTemplate(autoTitle, original, analysis);
+            
+            const now = new Date();
+            const y = now.getFullYear(), m = String(now.getMonth()+1), d = String(now.getDate());
+            const h = String(now.getHours()).padStart(2,'0'), mn = String(now.getMinutes()).padStart(2,'0');
+            const filePath = `docs/${y}/${m}/${y}_${m}_${d}_${h}${mn}.html`;
+            
+            try {
+                const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: `Matrix Update: ${autoTitle}`,
+                        content: btoa(unescape(encodeURIComponent(targetHtml)))
+                    })
+                });
+                
+                if(res.ok) {
+                    alert("🎉 推送成功！云端打工人正在重新编译日历...");
+                    document.getElementById('in-original').value = '';
+                    document.getElementById('in-analysis').value = '';
+                    // 自动滑回第一页
+                    document.getElementById('viewport').scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    const err = await res.json();
+                    alert("❌ 失败: " + err.message);
+                }
+            } catch(e) { alert("网络错误: " + e.message); }
+            
+            btn.innerText = "🚀 推送至云端矩阵"; btn.disabled = false;
+        }
 
-                if (year !== currentYear) {{
-                    html += `<h2 class="year-group">🗓️ ${{year}}年</h2>`;
-                    currentYear = year;
-                    currentMonth = ''; 
-                }}
-                if (month !== currentMonth) {{
-                    if (currentMonth !== '') html += '</ul>';
-                    html += `<h3 class="month-group">${{month}}月</h3><ul>`;
-                    currentMonth = month;
-                }}
+        // 超强独立模板生成器（修复了 script 解析拦截 BUG）
+        function generateTemplate(title, orig, anal) {
+            const safeOrig = orig.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const safeAnal = anal.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            
+            return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>${title}</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></scr` + `ipt>
+    <style>
+        :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: #2980b9; --highlight: #fef9e7; }
+        body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; }
+        .nav-back { margin-bottom: 25px; }
+        .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold;}
+        
+        /* Markdown 老师批改样式 */
+        .markdown-body { font-size: 1.05rem; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 25px; margin-bottom: 12px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
+        .markdown-body h3 { font-size: 1.2rem; }
+        .markdown-body p { margin-top: 0; margin-bottom: 15px; }
+        .markdown-body blockquote { margin: 0 0 15px 0; padding: 12px 18px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.15rem; border-radius: 0 8px 8px 0; }
+        .markdown-body hr { border: 0; border-top: 1px dashed #bdc3c7; margin: 25px 0; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.95rem; }
+        .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 12px; text-align: left; }
+        .markdown-body th { background: #f8f9fa; color: var(--accent); }
+        
+        /* 交互反馈 */
+        .view-mode.editing { display: none; }
+        .edit-mode { display: none; }
+        .edit-mode.active { display: block; }
+        .edit-textarea { width: 100%; min-height: 150px; padding: 15px; font-family: monospace; font-size: 15px; border: 2px dashed var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; margin-bottom: 15px; background: #fafafa; }
+        .edit-textarea:focus { outline: none; background: #fff; border-style: solid; }
+        .save-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        .cancel-btn { background: #ecf0f1; color: #333; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-left: 10px; font-size: 1rem; font-weight: bold;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back"><a href="../../index.html">🔙 返回矩阵枢纽</a></div>
+        
+        <!-- 存储原始数据的脚本块（绝对安全隔离） -->
+        <script id="raw-original" type="text/markdown">${safeOrig}</scr` + `ipt>
+        <script id="raw-analysis" type="text/markdown">${safeAnal}</scr` + `ipt>
 
-                html += `<li><a href="${{path}}">${{filename}}</a></li>`;
-            }});
-            html += '</ul>';
-            container.innerHTML = html;
-        }}
+        <!-- 原文区块 -->
+        <div class="card" id="block-original">
+            <div class="card-header"><span>📖 原始文本 (Original)</span> <span style="font-size:0.75rem; background:#eee; padding:2px 8px; border-radius:10px;">双指轻触编辑</span></div>
+            <div id="view-original" class="view-mode markdown-body"></div>
+            <div id="edit-original" class="edit-mode">
+                <textarea class="edit-textarea" id="textarea-original"></textarea>
+                <button class="save-btn" onclick="saveEdit('original')">💾 保存修改并推送</button>
+                <button class="cancel-btn" onclick="cancelEdit('original')">取消</button>
+            </div>
+        </div>
+
+        <!-- 深度分析区块 -->
+        <div class="card" id="block-analysis">
+            <div class="card-header"><span>🔬 深度解构 (Analysis)</span> <span style="font-size:0.75rem; background:#eee; padding:2px 8px; border-radius:10px;">双指轻触编辑</span></div>
+            <div id="view-analysis" class="view-mode markdown-body"></div>
+            <div id="edit-analysis" class="edit-mode">
+                <textarea class="edit-textarea" id="textarea-analysis"></textarea>
+                <button class="save-btn" onclick="saveEdit('analysis')">💾 保存修改并推送</button>
+                <button class="cancel-btn" onclick="cancelEdit('analysis')">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化渲染
+        function renderAll() {
+            document.getElementById('view-original').innerHTML = marked.parse(document.getElementById('raw-original').textContent);
+            document.getElementById('view-analysis').innerHTML = marked.parse(document.getElementById('raw-analysis').textContent);
+        }
+        renderAll();
+
+        // 监听双指触摸或双击触发编辑
+        ['original', 'analysis'].forEach(target => {
+            const viewBlock = document.getElementById('view-' + target);
+            
+            // 桌面端双击
+            viewBlock.addEventListener('dblclick', () => triggerEdit(target));
+            
+            // 移动端双指轻触
+            let lastTap = 0;
+            viewBlock.addEventListener('touchstart', e => {
+                if (e.touches.length === 2) triggerEdit(target); // 真正的双指触摸
+            });
+        });
+
+        function triggerEdit(target) {
+            document.getElementById('view-' + target).classList.add('editing');
+            const editBlock = document.getElementById('edit-' + target);
+            editBlock.classList.add('active');
+            document.getElementById('textarea-' + target).value = document.getElementById('raw-' + target).textContent;
+        }
+
+        function cancelEdit(target) {
+            document.getElementById('view-' + target).classList.remove('editing');
+            document.getElementById('edit-' + target).classList.remove('active');
+        }
+
+        async function saveEdit(target) {
+            const btn = document.querySelector('#edit-' + target + ' .save-btn');
+            btn.innerText = '📡 正在同步...';
+            
+            // 更新脚本标签中的原始数据
+            const newContent = document.getElementById('textarea-' + target).value;
+            document.getElementById('raw-' + target).textContent = newContent;
+            
+            // 获取最新全页 HTML
+            const newHtml = "<!DOCTYPE html>\\n<html lang=\\"zh-CN\\">\\n" + document.documentElement.innerHTML + "\\n</html>";
+            
+            // 从 localStorage 读取 Token (与枢纽同域，安全共享)
+            const token = localStorage.getItem('GH_TOKEN');
+            const owner = localStorage.getItem('GH_OWNER');
+            const repo = localStorage.getItem('GH_REPO');
+            
+            if(!token) {
+                alert("未检测到 GitHub Token。请回主页枢纽点击齿轮配置！");
+                btn.innerText = '💾 保存修改并推送';
+                return;
+            }
+
+            // 获取当前文件在 GitHub 的相对路径
+            const path = window.location.pathname;
+            const fileRelPath = path.substring(path.indexOf('docs/'));
+            
+            try {
+                // 1. 获取文件当前 SHA
+                const getRes = await fetch(\`https://api.github.com/repos/\${owner}/\${repo}/contents/\${fileRelPath}\`, {
+                    headers: { 'Authorization': \`token \${token}\` }
+                });
+                const fileData = await getRes.json();
+                
+                // 2. 提交更新覆盖
+                const putRes = await fetch(\`https://api.github.com/repos/\${owner}/\${repo}/contents/\${fileRelPath}\`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': \`token \${token}\`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: \`Update \${target} analysis via double-tap\`,
+                        content: btoa(unescape(encodeURIComponent(newHtml))),
+                        sha: fileData.sha
+                    })
+                });
+                
+                if(putRes.ok) {
+                    // 更新成功，退出编辑模式并重新渲染
+                    cancelEdit(target);
+                    renderAll();
+                    alert("✅ 云端同步成功！这篇讲义已被永久更新。");
+                } else {
+                    const err = await putRes.json();
+                    alert("同步失败: " + err.message);
+                }
+            } catch(e) {
+                alert("发生错误: " + e.message);
+            }
+            btn.innerText = '💾 保存修改并推送';
+        }
+    </scr` + `ipt>
+</body>
+</html>`;
+        }
     </script>
 </body>
-</html>
-"""
-    print("⚙️ 正在生成并推送最新的日历索引 (index.html)...")
-    upload_to_github("docs/index.html", index_content, "Calendar: Rebuild index")
+</html>"""
 
-
-def main():
-    # ---------------------------------------------------------
-    # 这里是你实际要推送的 HTML 语法分析内容。
-    # 实际使用中，可以写代码读取你本地的分析结果文件赋值给 html_content
-    # ---------------------------------------------------------
-    html_content = """
-    <html>
-    <head><title>Syntax Analysis</title></head>
-    <body>
-        <h2>这是一个新的句子分析测试</h2>
-        <p>自动生成的结构测试。</p>
-    </body>
-    </html>
-    """
-
-    # 获取当前时间，自动按 年、月 生成文件夹结构
-    now = datetime.datetime.now()
-    year_str = now.strftime("%Y")
-    month_str = now.strftime("%m")
-    date_str = now.strftime("%Y%m%d_%H%M%S") # 用作文件名防止重复
-
-    # 构建路径：docs/年/月/文件名.html
-    file_path = f"docs/{year_str}/{month_str}/analysis_{date_str}.html"
-
-    print(f"🚀 开始执行推送任务...\n目标保存路径: {file_path}")
-
-    # 第一步：把新内容推送到 年/月 文件夹下
-    is_success = upload_to_github(file_path, html_content, f"Add syntax analysis for {year_str}-{month_str}")
-    
-    # 第二步：推送成功后，自动触发重新抓取结构并更新 index.html
-    if is_success:
-        build_calendar_index()
-        print("🎉 所有操作已完成！现在打开你仓库的 GitHub Pages 就能看到最新的日历分类了。")
+    with open(os.path.join(BASE_DIR, "index.html"), "w", encoding="utf-8") as f:
+        f.write(html_content.replace("REPLACEME_JSON_DATA", json_data))
+    print("🚀 枢纽引擎编译完毕！")
 
 if __name__ == "__main__":
-    main()
+    generate_index()
