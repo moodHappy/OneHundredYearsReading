@@ -48,13 +48,13 @@ def generate_index():
 
     json_data = json.dumps(archive_data)
 
-    # 移除了前台表单录入页，纯粹极致的单页精美日历面板
+    # 移除了前台表单录入页和置顶目录，极其纯粹的单页日历面板
     html_content = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Daily Five Words</title>
+    <title>Macondo Matrix</title>
     <style>
         :root { --bg: #f5f5f7; --primary: #2980b9; --accent: #f39c12; --card: #ffffff; --border: #e0e0e0; --text: #333; }
         body, html { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); height: 100%; overflow-y: auto; -webkit-font-smoothing: antialiased; }
@@ -95,7 +95,7 @@ def generate_index():
 <body>
     <div class="container">
         <div class="header">
-            <h1>Daily Five Words</h1>
+            <h1>Macondo Matrix</h1>
             <p>《百年孤独》精读解构实验室</p>
             <button class="settings-btn" onclick="document.getElementById('modal').style.display='flex'">⚙️</button>
         </div>
@@ -115,7 +115,6 @@ def generate_index():
         <div class="feed-list" id="feedList"></div>
     </div>
 
-    <!-- 弹窗配置 -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <h3 style="margin-top:0; color:#2c3e50;">配置核心 Token</h3>
@@ -183,14 +182,11 @@ def generate_index():
             const list = document.getElementById('feedList');
             const data = (archiveData[sY] && archiveData[sY][sM] && archiveData[sY][sM][sD]) || [];
             
-            // 永远霸榜的百年孤独目录链接
-            const pinnedLink = `<a href="https://moodhappy.github.io/MiyetsukoSeries/Books/Hundred/%E7%99%BE%E5%B9%B4%E5%AD%A4%E7%8B%AC%E7%9B%AE%E5%BD%95_1782298920000.html" class="feed-item" style="border-left: 4px solid var(--accent); background: #fffdf7;"><span class="feed-time" style="color: var(--accent);">📌 目录</span><span class="feed-title" style="color: #333; font-weight: bold;">百年孤独 (One Hundred Years of Solitude)</span></a>`;
-            
             if(data.length) {
                 const itemsHtml = data.map(item => `<a href="${item.path}" class="feed-item"><span class="feed-time">${item.time}</span><span class="feed-title">${item.title}</span></a>`).join('');
-                list.innerHTML = pinnedLink + itemsHtml;
+                list.innerHTML = itemsHtml;
             } else {
-                list.innerHTML = pinnedLink + '<div style="text-align:center; padding: 25px 20px; color:#bdc3c7; font-size: 0.9rem;">当日无其他解构档案</div>';
+                list.innerHTML = '<div style="text-align:center; padding: 25px 20px; color:#bdc3c7; font-size: 0.9rem;">当日无解构档案</div>';
             }
         }
         
