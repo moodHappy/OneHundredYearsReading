@@ -19,8 +19,12 @@
         .header p { margin: 0; font-size: 0.9rem; color: #7f8c8d; letter-spacing: 1px; }
         .settings-btn { position: absolute; right: 0; top: 20px; background: none; border: none; font-size: 1.4rem; cursor: pointer; opacity: 0.8; }
         
-        .controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .controls { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 20px; }
         .select-box { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-weight: bold; background: var(--card); color: var(--primary); }
+        .nav-btn, .today-btn { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 8px 12px; font-weight: bold; font-size: 0.95rem; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s, background 0.2s;}
+        .nav-btn:active, .today-btn:active { transform: scale(0.95); background: #2471a3; }
+        .today-btn { padding: 8px 16px; }
+
         .calendar-wrapper { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; }
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 13px; color: #888; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
@@ -63,10 +67,11 @@
             <div class="container">
                 <div class="header">
                     <h1><span>Macondo</span> Matrix</h1>
-                    <p>句子解构与语法实验室</p>
+                    <p>百年孤独精读</p>
                     <button class="settings-btn" onclick="document.getElementById('modal').style.display='flex'">⚙️</button>
                 </div>
                 <div class="controls">
+                    <button class="nav-btn" id="prevMonthBtn">&lt;</button>
                     <select class="select-box" id="yearSelect"></select>
                     <select class="select-box" id="monthSelect">
                         <option value="1">01月</option><option value="2">02月</option><option value="3">03月</option>
@@ -74,6 +79,8 @@
                         <option value="7">07月</option><option value="8">08月</option><option value="9">09月</option>
                         <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
                     </select>
+                    <button class="nav-btn" id="nextMonthBtn">&gt;</button>
+                    <button class="today-btn" id="todayBtn">今日</button>
                 </div>
                 <div class="calendar-wrapper">
                     <div class="weekdays"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
@@ -188,6 +195,49 @@
         initSelects(); 
         renderCalendar(); 
         renderList();
+
+        // 绑定按钮事件控制
+        function ensureYearOption(y) {
+            let found = false;
+            for(let i=0; i<yearSelect.options.length; i++){
+                if(parseInt(yearSelect.options[i].value) === y) { found = true; break; }
+            }
+            if(!found) {
+                const opt = document.createElement('option'); opt.value = y; opt.textContent = y + '年';
+                yearSelect.appendChild(opt);
+                let opts = Array.from(yearSelect.options);
+                opts.sort((a,b) => parseInt(b.value) - parseInt(a.value));
+                yearSelect.innerHTML = '';
+                opts.forEach(o => yearSelect.appendChild(o));
+            }
+        }
+
+        function updateUI() {
+            ensureYearOption(sY);
+            yearSelect.value = sY;
+            monthSelect.value = sM;
+            renderCalendar();
+            renderList();
+        }
+
+        document.getElementById('prevMonthBtn').onclick = () => { 
+            sM--; 
+            if (sM < 1) { sM = 12; sY--; } 
+            updateUI(); 
+        };
+        
+        document.getElementById('nextMonthBtn').onclick = () => { 
+            sM++; 
+            if (sM > 12) { sM = 1; sY++; } 
+            updateUI(); 
+        };
+        
+        document.getElementById('todayBtn').onclick = () => { 
+            sY = today.getFullYear(); 
+            sM = today.getMonth() + 1; 
+            sD = today.getDate(); 
+            updateUI(); 
+        };
 
         function saveSettings() {
             localStorage.setItem('GH_TOKEN', document.getElementById('gh-token').value.trim());
