@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>He went from house to hou...</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: #6c5ce7; --highlight: #fef9e7; }
+        body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; padding-bottom: 50px;}
+        .nav-back { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
+        .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .sync-status { font-size: 0.85rem; color: #27ae60; font-weight: bold; display: none; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; font-weight: bold;}
+        .markdown-body { font-size: 1.05rem; line-height: 1.6; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
+        .markdown-body h3 { font-size: 1.15rem; }
+        .markdown-body p { margin-top: 0; margin-bottom: 8px; }
+        .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 8px; padding-left: 20px; }
+        .markdown-body li { margin-bottom: 4px; }
+        .markdown-body li p { margin: 0; }
+        .markdown-body p:empty { display: none; }
+        .markdown-body br + br { display: none; }
+        .markdown-body blockquote { margin: 0 0 10px 0; padding: 10px 15px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.1rem; border-radius: 0 8px 8px 0; }
+        .markdown-body blockquote p { margin-bottom: 0; }
+        .markdown-body hr { border: 0; border-top: 1px dashed #bdc3c7; margin: 15px 0; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.95rem; }
+        .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+        .markdown-body th { background: #f8f9fa; color: var(--accent); }
+        .edit-textarea { width: 100%; min-height: 250px; padding: 15px; font-family: monospace; font-size: 1.05rem; border: 2px solid var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; display: none; background: #fff; color: #2c3e50; line-height: 1.5; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="../../index.html">🔙 返回矩阵枢纽</a>
+            <span class="sync-status" id="sync-status">📡 同步中...</span>
+        </div>
+        <textarea id="raw-original" style="display:none;">He went from house to house dragging two metal ingots and everybody was amazed to see pots, pans, tongs, and braziers tumble down from their places and beams creak from the desperation of nails and screws trying to emerge, and even objects that had been lost for a long time appeared from where they had been searched for most and went dragging along in turbulent confusion behind Melquíades&#039; magical irons.</textarea>
+        <textarea id="raw-analysis" style="display:none;"># 📌 完整翻译
+
+他拖着两块金属锭挨家挨户地走着，人们惊奇地看到，锅、平底锅、火钳和火盆纷纷从原来的位置掉落下来；房梁因钉子和螺丝拼命想挣脱出来而发出吱呀作响的声音；甚至那些早已遗失多年的东西，也从人们找过无数次的地方显现出来，在梅尔基亚德斯那神奇的磁铁后面混乱地拖行着。
+
+---
+
+# 📘 英语教学式讲解
+
+## 1. He went from house to house
+- 他挨家挨户地走。  
+- from house to house：挨家挨户、逐户（固定表达）  
+- went：一般过去时，描述连续动作。  
+
+---
+
+## 2. dragging two metal ingots
+- 拖着两块金属锭。  
+- dragging：现在分词作伴随状语，表示“一路拖着”。  
+- metal ingots：金属锭（ingot 指铸成块状的金属）。  
+
+---
+
+## 3. and everybody was amazed to see
+- 所有人都惊讶地看到。  
+- was amazed：感到震惊、惊奇。  
+- be amazed to do：因看到……而感到惊讶。  
+
+---
+
+## 4. pots, pans, tongs, and braziers tumble down from their places
+- 锅、平底锅、火钳和火盆纷纷从原来的位置掉落下来。  
+- pots：锅。  
+- pans：平底锅。  
+- tongs：火钳、夹子。  
+- braziers：火盆、炭炉。  
+- tumble down：纷纷滚落、掉下来。  
+- from their places：从原来放置的位置。  
+
+---
+
+## 5. and beams creak
+- 房梁发出吱呀作响的声音。  
+- beams：横梁、房梁。  
+- creak：发出吱嘎声（木头受力时常用）。  
+
+---
+
+## 6. from the desperation of nails and screws trying to emerge
+- 因为钉子和螺丝拼命想挣脱出来。  
+- from：表示原因。  
+- desperation：拼命、绝望般的挣扎。  
+- nails and screws：钉子和螺丝。  
+- trying to emerge：试图钻出来、脱离原位。  
+- 作者运用了**拟人（personification）**，仿佛钉子和螺丝拥有生命。  
+
+---
+
+## 7. and even objects that had been lost for a long time appeared
+- 甚至那些早已遗失多年的物品也出现了。  
+- even：甚至。  
+- objects：物品。  
+- had been lost：过去完成时被动，表示“早就遗失了”。  
+- appeared：显现出来。  
+
+---
+
+## 8. from where they had been searched for most
+- 从那些人们寻找过无数次的地方。  
+- where：地点关系副词。  
+- had been searched for：过去完成时被动。  
+- search for：寻找（固定搭配）。  
+- most：这里表示“寻找次数最多”。  
+
+---
+
+## 9. and went dragging along in turbulent confusion
+- 并在一片混乱中一路拖行。  
+- went dragging along：一路被拖着前进。  
+- turbulent confusion：混乱而骚动的景象。  
+- turbulent：骚动的、翻腾的。  
+
+---
+
+## 10. behind Melquíades&#039; magical irons
+- 跟在梅尔基亚德斯神奇的磁铁后面。  
+- magical irons：字面意思是“神奇的铁器”，这里指前文那两块具有磁力的金属（磁铁）。  
+- behind：在……后面。  
+- 整句话描绘出所有金属物件被磁铁吸引、浩浩荡荡跟随其后的魔幻画面。  
+
+---
+
+# 📌 Key Expressions
+
+- from house to house —— 挨家挨户  
+- drag metal ingots —— 拖着金属锭  
+- be amazed to see —— 惊讶地看到  
+- tumble down —— 滚落、掉下来  
+- beams creak —— 房梁吱呀作响  
+- in desperation —— 拼命地、绝望地  
+- try to emerge —— 试图钻出来  
+- be lost for a long time —— 遗失很久  
+- search for —— 寻找  
+- turbulent confusion —— 一片混乱  
+- drag along —— 被拖着前进  
+- magical irons —— 神奇的磁铁（文学表达）</textarea>
+        <textarea id="raw-page-title" style="display:none;">Chapter 1</textarea>
+        <textarea id="raw-page-url" style="display:none;">https://moodhappy.github.io/MiyetsukoSeries/Books/Hundred/Chapter_001_1782296877406.html</textarea>
+        <div class="card">
+            <div class="card-header">📖 原始文本 (Original)</div>
+            <div class="source-info" style="margin-bottom: 12px; font-size: 0.9rem;">
+                <a href="https://moodhappy.github.io/MiyetsukoSeries/Books/Hundred/Chapter_001_1782296877406.html" target="_blank" style="color: #6c5ce7; text-decoration: none; font-weight: bold;">🔗 Chapter 1</a>
+            </div>
+            <div id="view-original" class="markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;"></div>
+        </div>
+        <div class="card" id="block-analysis">
+            <div class="card-header">🔬 深度解构 (Analysis)</div>
+            <div id="view-analysis" class="markdown-body"></div>
+            <textarea id="edit-analysis" class="edit-textarea"></textarea>
+        </div>
+    </div>
+    <script>
+        const GH_OWNER = "moodHappy";
+        const GH_REPO = "OneHundredYearsReading";
+        const ACCENT = "#6c5ce7";
+        function escapeHTML(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+        const buildHTML = function(title, safeOrig, safeAnal, safePageTitle, safePageUrl, GH_OWNER, GH_REPO, accent, renderFnStr, editFnStr, escapeFnStr, builderFnStr) {
+        return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>${title}</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></scr`+`ipt>
+    <style>
+        :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: ${accent}; --highlight: #fef9e7; }
+        body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; padding-bottom: 50px;}
+        .nav-back { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
+        .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .sync-status { font-size: 0.85rem; color: #27ae60; font-weight: bold; display: none; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; font-weight: bold;}
+        .markdown-body { font-size: 1.05rem; line-height: 1.6; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
+        .markdown-body h3 { font-size: 1.15rem; }
+        .markdown-body p { margin-top: 0; margin-bottom: 8px; }
+        .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 8px; padding-left: 20px; }
+        .markdown-body li { margin-bottom: 4px; }
+        .markdown-body li p { margin: 0; }
+        .markdown-body p:empty { display: none; }
+        .markdown-body br + br { display: none; }
+        .markdown-body blockquote { margin: 0 0 10px 0; padding: 10px 15px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.1rem; border-radius: 0 8px 8px 0; }
+        .markdown-body blockquote p { margin-bottom: 0; }
+        .markdown-body hr { border: 0; border-top: 1px dashed #bdc3c7; margin: 15px 0; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.95rem; }
+        .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+        .markdown-body th { background: #f8f9fa; color: var(--accent); }
+        .edit-textarea { width: 100%; min-height: 250px; padding: 15px; font-family: monospace; font-size: 1.05rem; border: 2px solid var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; display: none; background: #fff; color: #2c3e50; line-height: 1.5; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="../../index.html">🔙 返回矩阵枢纽</a>
+            <span class="sync-status" id="sync-status">📡 同步中...</span>
+        </div>
+        <textarea id="raw-original" style="display:none;">${safeOrig}</textarea>
+        <textarea id="raw-analysis" style="display:none;">${safeAnal}</textarea>
+        <textarea id="raw-page-title" style="display:none;">${safePageTitle}</textarea>
+        <textarea id="raw-page-url" style="display:none;">${safePageUrl}</textarea>
+        <div class="card">
+            <div class="card-header">📖 原始文本 (Original)</div>
+            <div class="source-info" style="margin-bottom: 12px; font-size: 0.9rem;">
+                <a href="${safePageUrl}" target="_blank" style="color: ${accent}; text-decoration: none; font-weight: bold;">🔗 ${safePageTitle}</a>
+            </div>
+            <div id="view-original" class="markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;"></div>
+        </div>
+        <div class="card" id="block-analysis">
+            <div class="card-header">🔬 深度解构 (Analysis)</div>
+            <div id="view-analysis" class="markdown-body"></div>
+            <textarea id="edit-analysis" class="edit-textarea"></textarea>
+        </div>
+    </div>
+    <script>
+        const GH_OWNER = "${GH_OWNER}";
+        const GH_REPO = "${GH_REPO}";
+        const ACCENT = "${accent}";
+        ${escapeFnStr}
+        const buildHTML = ${builderFnStr};
+        const renderAll = ${renderFnStr};
+        const triggerEdit = ${editFnStr};
+        window.onload = renderAll;
+        const viewBlock = document.getElementById('view-analysis');
+        const editBlock = document.getElementById('edit-analysis');
+        const statusMsg = document.getElementById('sync-status');
+        viewBlock.addEventListener('dblclick', triggerEdit);
+        viewBlock.addEventListener('touchstart', e => {
+            if (e.touches.length === 2) triggerEdit();
+        });
+        editBlock.addEventListener('blur', async function() {
+            const newText = editBlock.value.trim();
+            const oldText = document.getElementById('raw-analysis').value.trim();
+            editBlock.style.display = 'none';
+            viewBlock.style.display = 'block';
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-analysis').value = newText;
+                renderAll();
+                const token = localStorage.getItem('GH_TOKEN');
+                if(!token) return alert("⚠️ 缺少 GH_TOKEN。请确保在主枢纽页面配置过！");
+                statusMsg.style.display = 'block';
+                statusMsg.style.color = ACCENT;
+                statusMsg.innerText = '📡 静默同步中...';
+                const orig = document.getElementById('raw-original').value;
+                const pTitle = document.getElementById('raw-page-title').value;
+                const pUrl = document.getElementById('raw-page-url').value;
+                const pureHtml = buildHTML(
+                    document.title,
+                    escapeHTML(orig),
+                    escapeHTML(newText),
+                    escapeHTML(pTitle),
+                    escapeHTML(pUrl),
+                    GH_OWNER,
+                    GH_REPO,
+                    ACCENT,
+                    renderAll.toString(),
+                    triggerEdit.toString(),
+                    escapeHTML.toString(),
+                    buildHTML.toString()
+                );
+                const path = window.location.pathname;
+                const fileRelPath = path.substring(path.indexOf('docs/'));
+                try {
+                    const utf8Array = Array.from(new TextEncoder().encode(pureHtml));
+                    const binaryString = utf8Array.map(b => String.fromCharCode(b)).join('');
+                    const base64Html = btoa(binaryString);
+                    const getRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
+                        headers: { 'Authorization': \`token \${token}\` }
+                    });
+                    const fileData = await getRes.json();
+                    const putRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': \`token \${token}\`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: \`Auto-save analysis update\`,
+                            content: base64Html,
+                            sha: fileData.sha
+                        })
+                    });
+                    if(putRes.ok) {
+                        statusMsg.style.color = '#27ae60';
+                        statusMsg.innerText = '✅ 云端已同步';
+                        setTimeout(() => statusMsg.style.display = 'none', 3000);
+                    } else {
+                        statusMsg.style.color = '#e74c3c';
+                        statusMsg.innerText = '❌ 同步失败';
+                    }
+                } catch(e) {
+                    statusMsg.style.color = '#e74c3c';
+                    statusMsg.innerText = '❌ 网络断开';
+                }
+            }
+        });
+    </scr`+`ipt>
+</body>
+</html>`;
+    };
+        const renderAll = function() {
+        document.getElementById('view-original').textContent = document.getElementById('raw-original').value;
+        const analContent = document.getElementById('raw-analysis').value;
+        try {
+            if (typeof marked !== 'undefined') {
+                document.getElementById('view-analysis').innerHTML = marked.parse(analContent);
+            }
+        } catch(e) {
+            console.error("Markdown failed", e);
+        }
+    };
+        const triggerEdit = function() {
+        const viewBlock = document.getElementById('view-analysis');
+        const editBlock = document.getElementById('edit-analysis');
+        viewBlock.style.display = 'none';
+        editBlock.style.display = 'block';
+        editBlock.value = document.getElementById('raw-analysis').value;
+        editBlock.focus();
+    };
+        window.onload = renderAll;
+        const viewBlock = document.getElementById('view-analysis');
+        const editBlock = document.getElementById('edit-analysis');
+        const statusMsg = document.getElementById('sync-status');
+        viewBlock.addEventListener('dblclick', triggerEdit);
+        viewBlock.addEventListener('touchstart', e => {
+            if (e.touches.length === 2) triggerEdit();
+        });
+        editBlock.addEventListener('blur', async function() {
+            const newText = editBlock.value.trim();
+            const oldText = document.getElementById('raw-analysis').value.trim();
+            editBlock.style.display = 'none';
+            viewBlock.style.display = 'block';
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-analysis').value = newText;
+                renderAll();
+                const token = localStorage.getItem('GH_TOKEN');
+                if(!token) return alert("⚠️ 缺少 GH_TOKEN。请确保在主枢纽页面配置过！");
+                statusMsg.style.display = 'block';
+                statusMsg.style.color = ACCENT;
+                statusMsg.innerText = '📡 静默同步中...';
+                const orig = document.getElementById('raw-original').value;
+                const pTitle = document.getElementById('raw-page-title').value;
+                const pUrl = document.getElementById('raw-page-url').value;
+                const pureHtml = buildHTML(
+                    document.title,
+                    escapeHTML(orig),
+                    escapeHTML(newText),
+                    escapeHTML(pTitle),
+                    escapeHTML(pUrl),
+                    GH_OWNER,
+                    GH_REPO,
+                    ACCENT,
+                    renderAll.toString(),
+                    triggerEdit.toString(),
+                    escapeHTML.toString(),
+                    buildHTML.toString()
+                );
+                const path = window.location.pathname;
+                const fileRelPath = path.substring(path.indexOf('docs/'));
+                try {
+                    const utf8Array = Array.from(new TextEncoder().encode(pureHtml));
+                    const binaryString = utf8Array.map(b => String.fromCharCode(b)).join('');
+                    const base64Html = btoa(binaryString);
+                    const getRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, {
+                        headers: { 'Authorization': `token ${token}` }
+                    });
+                    const fileData = await getRes.json();
+                    const putRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `Auto-save analysis update`,
+                            content: base64Html,
+                            sha: fileData.sha
+                        })
+                    });
+                    if(putRes.ok) {
+                        statusMsg.style.color = '#27ae60';
+                        statusMsg.innerText = '✅ 云端已同步';
+                        setTimeout(() => statusMsg.style.display = 'none', 3000);
+                    } else {
+                        statusMsg.style.color = '#e74c3c';
+                        statusMsg.innerText = '❌ 同步失败';
+                    }
+                } catch(e) {
+                    statusMsg.style.color = '#e74c3c';
+                    statusMsg.innerText = '❌ 网络断开';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
