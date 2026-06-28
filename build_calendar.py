@@ -1,5 +1,6 @@
 import os
 import json
+import re
 
 BASE_DIR = "docs"
 
@@ -28,21 +29,60 @@ def generate_index():
                         parts = file.replace(".html", "").split('_')
                         if len(parts) >= 4:
                             d_int = int(parts[2]) 
-                            # 修复时间 BUG：严格截取时和分，抛弃尾部的秒数 [2:4]
+                            # 严格截取时和分
                             time_str = f"{parts[3][:2]}:{parts[3][2:4]}"
                             file_path = f"{year}/{month}/{file}"
                             
-                            title = "📌 语法解构"
+                            snippet = ""
                             with open(os.path.join(BASE_DIR, year, month, file), 'r', encoding='utf-8') as f_html:
-                                content = f_html.read(2000)
-                                start = content.find('<title>')
-                                end = content.find('</title>')
-                                if start != -1 and end != -1:
-                                    title = content[start+7:end]
-
+                                # 读取足够多的内容以寻找正文，最高读取10000字符防止内存占用
+                                content = f_html.read(10000) 
+                                
+                                # 定位正文部分
+                                body_start = content.find('<body')
+                                search_area = content[body_start:] if body_start != -1 else content
+                                
+                                # 将常见的块级元素替换为换行符，以便分行提取
+                                text_block = re.sub(r'</?(div|p|br|h[1-6]|li|article|section)[^>]*>', '\n', search_area, flags=re.IGNORECASE)
+                                # 去除其余所有 HTML 标签
+                                pure_text = re.sub(r'<[^>]+>', '', text_block)
+                                
+                                # 按行分割并去除空白
+                                lines = [line.strip() for line in pure_text.split('\n') if line.strip()]
+                                
+                                # 1. 尝试寻找“原始摘录”或“Original Text”
+                                for i, line in enumerate(lines):
+                                    if "原始摘录" in line or "Original Text" in line:
+                                        if i + 1 < len(lines):
+                                            snippet = lines[i+1] # 抓取特征词后的下一行正文
+                                        else:
+                                            snippet = line
+                                        break
+                                
+                                # 2. 如果没找到特定标题，随便抓取第一段具有一定长度的文字
+                                if not snippet:
+                                    for line in lines:
+                                        # 过滤掉可能的 CSS/JS 残留或极短的标题
+                                        if len(line) > 15 and not re.match(r'^[\.\#\{\}\;]', line):
+                                            snippet = line
+                                            break
+                                            
+                                # 3. 终极回退：抓取网页 title 标签
+                                if not snippet:
+                                    start = content.find('<title>')
+                                    end = content.find('</title>')
+                                    if start != -1 and end != -1:
+                                        snippet = content[start+7:end].strip()
+                                    else:
+                                        snippet = "📌 语法解构"
+                            
+                            # 截取最多100个字符避免 JSON 过大，多出的部分 CSS 会自动加省略号
+                            if len(snippet) > 100:
+                                snippet = snippet[:100]
+                                
                             if d_int not in archive_data[y_int][m_int]:
                                 archive_data[y_int][m_int][d_int] = []
-                            archive_data[y_int][m_int][d_int].append({"time": time_str, "path": file_path, "title": title})
+                            archive_data[y_int][m_int][d_int].append({"time": time_str, "path": file_path, "title": snippet})
                     except Exception as e:
                         print(f"解析文件出错 {file}: {e}")
 
@@ -68,7 +108,7 @@ def generate_index():
         .controls { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 20px; }
         .select-box { padding: 0 12px; border: 1px solid var(--border); border-radius: 6px; outline: none; font-weight: bold; background: var(--card); color: var(--primary); height: 36px; box-sizing: border-box; font-size: 0.95rem; }
         
-        /* 新增按钮样式 */
+        /* 按钮样式 */
         .btn-nav, .btn-today {
             background-color: var(--btn-blue);
             color: white;
