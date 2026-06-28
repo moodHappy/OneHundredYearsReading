@@ -1,0 +1,33 @@
+name: Sync Syntax Calendar
+
+on:
+  push:
+    paths:
+      - 'docs/**/*.html'
+      - '!docs/index.html' # 避开主页自身的更新，防止死循环
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Rebuild Calendar Index
+        run: python build_calendar.py
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add docs/index.html
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Calendar: Synchronized new syntax analysis" && git push)
