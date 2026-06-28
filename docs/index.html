@@ -95,7 +95,7 @@
                 </div>
                 <div class="form-group">
                     <label>教师级剖析 (Markdown Analysis)</label>
-                    <textarea id="in-analysis" class="form-control" style="min-height: 280px;" placeholder="支持 Markdown 语法。例如：\n\n### 句子核心意思\n...\n\n### 句子结构分析\n> 引用原文\n..."></textarea>
+                    <textarea id="in-analysis" class="form-control" style="min-height: 280px;" placeholder="支持 Markdown 语法..."></textarea>
                 </div>
                 <button class="btn-push" id="pushBtn" onclick="pushToGitHub()">🚀 推送至云端矩阵</button>
                 <div class="page-indicator" style="margin-top: 20px;">向右滑动返回日历枢纽 →</div>
@@ -113,7 +113,6 @@
     </div>
 
     <script>
-        // --- 强制焊死的终极目标仓库 ---
         const GH_OWNER = "moodHappy";
         const GH_REPO = "OneHundredYearsReading";
 
@@ -192,7 +191,6 @@
             document.getElementById('modal').style.display = 'none';
         }
 
-        // 字符转义，防止破坏 HTML 结构
         function escapeHTML(str) {
             return str.replace(/&/g, '&amp;')
                       .replace(/</g, '&lt;')
@@ -231,14 +229,15 @@
             const filePath = `docs/${y}/${m}/${y}_${m}_${d}_${h}${mn}.html`;
             
             try {
-                // 彻底解决内存溢出：使用经典的 UTF-8 转 Base64 方法，稳如磐石
-                const base64Html = btoa(unescape(encodeURIComponent(targetHtml)));
+                const utf8Encode = new TextEncoder().encode(targetHtml);
+                const binaryString = String.fromCodePoint(...utf8Encode);
+                const base64Html = btoa(binaryString);
 
                 const res = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${filePath}`, {
                     method: 'PUT',
                     headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        message: `Matrix Record: ${autoTitle}`,
+                        message: `Syntax Matrix Record: ${autoTitle}`,
                         content: base64Html
                     })
                 });
@@ -258,8 +257,7 @@
         }
 
         // ==========================================
-        // 这段代码的作用是吐出单个时间戳的独立 HTML 文件。
-        // 它自带防白屏的文本直出功能，并在内部封装了自己的无痕编辑和同步逻辑。
+        // 生成极度紧凑排版的子页面 HTML
         // ==========================================
         function generateTemplate(title, orig, anal) {
             const safeOrig = escapeHTML(orig);
@@ -274,23 +272,35 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></scr` + `ipt>
     <style>
         :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: #2980b9; --highlight: #fef9e7; }
-        body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; margin: 0; padding: 20px; }
+        body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
         .container { max-width: 700px; margin: 0 auto; padding-bottom: 50px;}
         .nav-back { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
         .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .sync-status { font-size: 0.85rem; color: #27ae60; font-weight: bold; display: none; }
         
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; font-weight: bold;}
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; font-weight: bold;}
         
-        .markdown-body { font-size: 1.05rem; }
-        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 25px; margin-bottom: 12px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
-        .markdown-body h3 { font-size: 1.2rem; }
-        .markdown-body p { margin-top: 0; margin-bottom: 15px; }
-        .markdown-body blockquote { margin: 0 0 15px 0; padding: 12px 18px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.15rem; border-radius: 0 8px 8px 0; }
-        .markdown-body hr { border: 0; border-top: 1px dashed #bdc3c7; margin: 25px 0; }
-        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.95rem; }
-        .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 12px; text-align: left; }
+        /* 极致紧凑的 Markdown 渲染样式 */
+        .markdown-body { font-size: 1.05rem; line-height: 1.6; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
+        .markdown-body h3 { font-size: 1.15rem; }
+        .markdown-body p { margin-top: 0; margin-bottom: 8px; }
+        
+        /* 消除松散列表造成的巨大空隙 */
+        .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 8px; padding-left: 20px; }
+        .markdown-body li { margin-bottom: 4px; }
+        .markdown-body li p { margin: 0; } 
+        
+        /* 自动隐藏因多敲回车产生的纯空白行 */
+        .markdown-body p:empty { display: none; } 
+        .markdown-body br + br { display: none; } 
+        
+        .markdown-body blockquote { margin: 0 0 10px 0; padding: 10px 15px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.1rem; border-radius: 0 8px 8px 0; }
+        .markdown-body blockquote p { margin-bottom: 0; }
+        .markdown-body hr { border: 0; border-top: 1px dashed #bdc3c7; margin: 15px 0; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.95rem; }
+        .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px; text-align: left; }
         .markdown-body th { background: #f8f9fa; color: var(--accent); }
         
         /* 无痕静默编辑区 */
@@ -309,12 +319,12 @@
 
         <div class="card">
             <div class="card-header">📖 原始文本 (Original)</div>
-            <div id="view-original" class="markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;">${safeOrig}</div>
+            <div id="view-original" class="markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;"></div>
         </div>
 
         <div class="card" id="block-analysis">
             <div class="card-header">🔬 深度解构 (Analysis)</div>
-            <div id="view-analysis" class="markdown-body" style="white-space: pre-wrap;">${safeAnal}</div>
+            <div id="view-analysis" class="markdown-body"></div>
             <textarea id="edit-analysis" class="edit-textarea"></textarea>
         </div>
     </div>
@@ -324,7 +334,9 @@
         const GH_REPO = "OneHundredYearsReading";
 
         function renderAll() {
+            document.getElementById('view-original').textContent = document.getElementById('raw-original').value;
             const analContent = document.getElementById('raw-analysis').value;
+            
             try {
                 if (typeof marked !== 'undefined') {
                     document.getElementById('view-analysis').innerHTML = marked.parse(analContent);
@@ -337,7 +349,6 @@
         const editBlock = document.getElementById('edit-analysis');
         const statusMsg = document.getElementById('sync-status');
 
-        // 双指触摸或双击触发编辑
         viewBlock.addEventListener('dblclick', triggerEdit);
         viewBlock.addEventListener('touchstart', e => {
             if (e.touches.length === 2) triggerEdit(); 
@@ -354,13 +365,11 @@
             return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
 
-        // 为了防止保存时把 DOM 的垃圾元素混进去，我们在子页面里内置这套自洁引擎
         function reconstructSelfHTML(newAnal) {
             const orig = document.getElementById('raw-original').value;
             const safeOrig = escapeHTML(orig);
             const safeAnal = escapeHTML(newAnal);
             
-            // 构建纯净源码，跟第一次推送时一模一样！
             const template = \`<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n\` + document.head.innerHTML + \`\n</head>\n<body>\n\` +
             \`    <div class="container">\n\` +
             \`        <div class="nav-back">\n\` +
@@ -371,11 +380,11 @@
             \`        <textarea id="raw-analysis" style="display:none;">\${safeAnal}</textarea>\n\n\` +
             \`        <div class="card">\n\` +
             \`            <div class="card-header">📖 原始文本 (Original)</div>\n\` +
-            \`            <div id="view-original" class="markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;">\${safeOrig}</div>\n\` +
+            \`            <div id="view-original" class="markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;"></div>\n\` +
             \`        </div>\n\n\` +
             \`        <div class="card" id="block-analysis">\n\` +
             \`            <div class="card-header">🔬 深度解构 (Analysis)</div>\n\` +
-            \`            <div id="view-analysis" class="markdown-body" style="white-space: pre-wrap;">\${safeAnal}</div>\n\` +
+            \`            <div id="view-analysis" class="markdown-body"></div>\n\` +
             \`            <textarea id="edit-analysis" class="edit-textarea"></textarea>\n\` +
             \`        </div>\n\` +
             \`    </div>\n\n\` +
@@ -395,7 +404,6 @@
             return template;
         }
 
-        // 失去焦点静默保存
         editBlock.onblur = async function() {
             const newText = editBlock.value.trim();
             const oldText = document.getElementById('raw-analysis').value.trim();
@@ -414,13 +422,15 @@
                 statusMsg.style.color = '#2980b9';
                 statusMsg.innerText = '📡 静默同步中...';
                 
-                // 重构最纯净的全页 HTML 源码
                 const pureHtml = reconstructSelfHTML(newText);
-                
                 const path = window.location.pathname;
                 const fileRelPath = path.substring(path.indexOf('docs/'));
                 
                 try {
+                    const utf8Encode = new TextEncoder().encode(pureHtml);
+                    const binaryString = String.fromCodePoint(...utf8Encode);
+                    const base64Html = btoa(binaryString);
+
                     const getRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
                         headers: { 'Authorization': \`token \${token}\` }
                     });
@@ -431,7 +441,7 @@
                         headers: { 'Authorization': \`token \${token}\`, 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             message: \`Auto-save analysis update\`,
-                            content: btoa(unescape(encodeURIComponent(pureHtml))),
+                            content: base64Html,
                             sha: fileData.sha
                         })
                     });
