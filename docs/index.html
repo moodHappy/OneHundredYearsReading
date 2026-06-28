@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Syntax Lab 枢纽</title>
+    <title>Syntax Matrix 枢纽</title>
     <style>
-        :root { --bg: #f5f5f7; --primary: #2c3e50; --accent: #c0392b; --card: #ffffff; --border: #e0e0e0; --text: #333; }
-        body, html { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); height: 100%; overflow: hidden; }
+        :root { --bg: #f5f5f7; --primary: #2980b9; --accent: #f1c40f; --card: #ffffff; --border: #e0e0e0; --text: #333; }
+        body, html { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); height: 100%; overflow: hidden; }
         
         .viewport { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; height: 100vh; -webkit-overflow-scrolling: touch; }
         .viewport::-webkit-scrollbar { display: none; }
@@ -14,54 +14,57 @@
         
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { text-align: center; padding: 20px 0; border-bottom: 1px dashed var(--border); margin-bottom: 20px; position: relative; }
-        .header h1 { margin: 0 0 5px 0; font-size: 1.8rem; color: var(--primary); }
-        .header p { margin: 0; font-size: 0.85rem; color: #7f8c8d; }
-        .settings-btn { position: absolute; right: 0; top: 20px; background: none; border: none; font-size: 1.2rem; cursor: pointer; }
+        .header h1 { margin: 0 0 5px 0; font-size: 2rem; color: var(--primary); font-weight: 800; }
+        .header h1 span { color: #f39c12; }
+        .header p { margin: 0; font-size: 0.9rem; color: #7f8c8d; letter-spacing: 1px; }
+        .settings-btn { position: absolute; right: 0; top: 20px; background: none; border: none; font-size: 1.4rem; cursor: pointer; opacity: 0.8; }
         
         /* 日历样式 */
-        .controls { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; }
-        .select-box { padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; outline: none; font-weight: bold; }
-        .calendar-wrapper { background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; }
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 13px; color: #888; font-weight: bold; margin-bottom: 10px; }
-        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .day-cell { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-weight: bold; border-radius: 8px; position: relative; cursor: pointer; }
+        .controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .select-box { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-weight: bold; background: var(--card); color: var(--primary); }
+        .calendar-wrapper { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 13px; color: #888; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .day-cell { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-weight: bold; border-radius: 10px; position: relative; cursor: pointer; transition: all 0.2s; }
         .day-cell.empty { visibility: hidden; }
-        .day-cell.has-news { color: var(--text); }
-        .day-cell.no-news { color: #ccc; }
-        .day-cell.selected { background: #fadbd8; color: var(--accent); border: 1px solid var(--accent); }
-        .dot { width: 4px; height: 4px; background: var(--accent); border-radius: 50%; position: absolute; bottom: 4px; display: none; }
+        .day-cell.has-news { color: var(--text); background: #fdfdfd; border: 1px solid #f5f5f5; }
+        .day-cell.no-news { color: #dcdde1; }
+        .day-cell.selected { background: #eaf2f8; color: var(--primary); border: 1px solid #3498db; }
+        .day-cell.today { background: #fff9e6; border: 1px solid #f1c40f; }
+        .dot { width: 5px; height: 5px; background: var(--primary); border-radius: 50%; position: absolute; bottom: 5px; display: none; }
         .day-cell.has-news .dot { display: block; }
         
-        .feed-list { display: flex; flex-direction: column; gap: 10px; }
-        .feed-item { background: var(--card); padding: 15px; border-radius: 10px; text-decoration: none; color: var(--text); border-left: 4px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; gap: 10px; align-items: center; }
-        .feed-time { font-family: monospace; color: var(--accent); font-weight: bold; }
-        .feed-title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .feed-list { display: flex; flex-direction: column; gap: 12px; }
+        .feed-item { background: var(--card); padding: 18px; border-radius: 12px; text-decoration: none; color: var(--text); border-left: 5px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 5px; transition: transform 0.2s; }
+        .feed-item:active { transform: scale(0.98); background: #fafafa; }
+        .feed-time { font-family: monospace; color: #7f8c8d; font-size: 0.85rem; }
+        .feed-title { font-weight: bold; font-size: 1.05rem; }
         
         /* 录入表单样式 */
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: var(--primary); font-size: 0.9rem; }
-        .form-control { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; font-family: inherit; resize: vertical; }
-        .form-control:focus { outline: none; border-color: var(--primary); }
-        textarea.form-control { min-height: 120px; }
-        .btn-push { width: 100%; background: var(--accent); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(192,57,43,0.3); }
-        .btn-push:active { transform: scale(0.98); }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: var(--primary); font-size: 0.95rem; }
+        .form-control { width: 100%; box-sizing: border-box; padding: 15px; border: 1px solid var(--border); border-radius: 10px; font-size: 1rem; font-family: inherit; resize: vertical; background: var(--card); }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(41,128,185,0.1); }
+        textarea.form-control { min-height: 120px; line-height: 1.5; }
+        .btn-push { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 10px; font-size: 1.15rem; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(41,128,185,0.3); transition: background 0.2s; }
+        .btn-push:active { transform: scale(0.98); background: #2471a3; }
         
         /* 模态框 */
-        .modal { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 100%; max-width: 350px; }
-        .modal-content input { width: 100%; padding: 10px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; }
-        .modal-content button { width: 100%; padding: 10px; background: var(--primary); color: #fff; border: none; border-radius: 6px; }
+        .modal { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(4px); }
+        .modal-content { background: #fff; padding: 25px; border-radius: 16px; width: 100%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .modal-content input { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
+        .modal-content button { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; }
         
-        /* 页面指示器 */
-        .page-indicator { text-align: center; color: #888; font-size: 0.8rem; padding: 10px; opacity: 0.7; }
+        .page-indicator { text-align: center; color: #95a5a6; font-size: 0.85rem; padding: 15px; letter-spacing: 1px; }
     </style>
 </head>
 <body>
     <div class="viewport" id="viewport">
+        <!-- 第一页：日历归档 -->
         <div class="page" id="page-1">
             <div class="container">
                 <div class="header">
-                    <h1>Syntax Matrix</h1>
+                    <h1><span>Syntax</span> Matrix</h1>
                     <p>句子解构与语法实验室</p>
                     <button class="settings-btn" onclick="document.getElementById('modal').style.display='flex'">⚙️</button>
                 </div>
@@ -83,6 +86,7 @@
             </div>
         </div>
         
+        <!-- 第二页：输入控制台 -->
         <div class="page" id="page-2">
             <div class="container">
                 <div class="header">
@@ -90,16 +94,12 @@
                     <p>将复杂的长难句拆解至最小单元</p>
                 </div>
                 <div class="form-group">
-                    <label>标题 (Title)</label>
-                    <input type="text" id="in-title" class="form-control" placeholder="例如：The import house sent along...">
-                </div>
-                <div class="form-group">
                     <label>原文 (Original Text)</label>
                     <textarea id="in-original" class="form-control" placeholder="输入英语原句..."></textarea>
                 </div>
                 <div class="form-group">
                     <label>教师级剖析 (Markdown Analysis)</label>
-                    <textarea id="in-analysis" class="form-control" style="min-height: 250px;" placeholder="支持 Markdown 语法。例如：
+                    <textarea id="in-analysis" class="form-control" style="min-height: 280px;" placeholder="支持 Markdown 语法。例如：
 
 ### 句子核心意思
 ...
@@ -114,13 +114,14 @@
         </div>
     </div>
 
+    <!-- 弹窗配置 -->
     <div class="modal" id="modal">
         <div class="modal-content">
-            <h3 style="margin-top:0;">配置核心 Token</h3>
+            <h3 style="margin-top:0; color:#2c3e50;">配置核心 Token</h3>
             <input type="password" id="gh-token" placeholder="GitHub Personal Access Token">
             <input type="text" id="gh-owner" placeholder="GitHub 用户名 (如 moodHappy)">
             <input type="text" id="gh-repo" placeholder="GitHub 仓库名 (如 Syntax-Lab)">
-            <button onclick="saveSettings()">保存本地</button>
+            <button onclick="saveSettings()">💾 保存至本地设备</button>
         </div>
     </div>
 
@@ -146,17 +147,31 @@
         
         function renderCalendar() {
             daysGrid.innerHTML = '';
-            const firstDay = new Date(sY, sM - 1, 1).getDay() || 7;
+            // 获取当月第一天是星期几，将其转换为 1(周一) 到 7(周日)
+            let firstDay = new Date(sY, sM - 1, 1).getDay();
+            if (firstDay === 0) firstDay = 7;
+            
             const daysInMonth = new Date(sY, sM, 0).getDate();
-            for(let i=1; i<firstDay; i++) daysGrid.innerHTML += '<div class="day-cell empty"></div>';
+            
+            // 填充空白格子
+            for(let i=1; i<firstDay; i++) {
+                daysGrid.innerHTML += '<div class="day-cell empty"></div>';
+            }
             
             const monthData = (archiveData[sY] && archiveData[sY][sM]) || {};
             for(let d=1; d<=daysInMonth; d++) {
                 const hasNews = monthData[d] && monthData[d].length > 0;
-                const isSelected = sY === today.getFullYear() && sM === today.getMonth()+1 && d === today.getDate();
+                const isToday = sY === today.getFullYear() && sM === today.getMonth()+1 && d === today.getDate();
+                const isSelected = d === sD;
+                
+                let classes = 'day-cell';
+                if(hasNews) classes += ' has-news'; else classes += ' no-news';
+                if(isToday) classes += ' today';
+                if(isSelected) classes += ' selected';
+                
                 const cell = document.createElement('div');
-                cell.className = `day-cell ${hasNews ? 'has-news' : 'no-news'} ${d === sD ? 'selected' : ''}`;
-                cell.innerHTML = `${d} <div class="dot" style="display:${hasNews?'block':'none'}"></div>`;
+                cell.className = classes;
+                cell.innerHTML = d + `<div class="dot" style="display:${hasNews?'block':'none'}"></div>`;
                 cell.onclick = () => { sD = d; renderCalendar(); renderList(); };
                 daysGrid.appendChild(cell);
             }
@@ -166,15 +181,18 @@
             const list = document.getElementById('feedList');
             const data = (archiveData[sY] && archiveData[sY][sM] && archiveData[sY][sM][sD]) || [];
             if(data.length) {
-                list.innerHTML = data.map(item => `<a href="${item.path}" class="feed-item"><span class="feed-time">${item.time}</span><span class="feed-title">${item.title}</span></a>`).join('');
+                list.innerHTML = data.map(item => `<a href="${item.path}" class="feed-item"><span class="feed-title">${item.title}</span><span class="feed-time">${item.time} 录入</span></a>`).join('');
             } else {
-                list.innerHTML = '<div style="text-align:center; padding: 20px; color:#888;">当日无解构档案</div>';
+                list.innerHTML = '<div style="text-align:center; padding: 30px 20px; color:#bdc3c7; border: 1px dashed #e0e0e0; border-radius: 12px;">当日无解构档案</div>';
             }
         }
         
         yearSelect.onchange = e => { sY = parseInt(e.target.value); renderCalendar(); renderList(); };
         monthSelect.onchange = e => { sM = parseInt(e.target.value); renderCalendar(); renderList(); };
-        initSelects(); renderCalendar(); renderList();
+        
+        initSelects(); 
+        renderCalendar(); 
+        renderList();
 
         // --- 2. 配置管理 ---
         function saveSettings() {
@@ -192,19 +210,22 @@
             const token = localStorage.getItem('GH_TOKEN');
             const owner = localStorage.getItem('GH_OWNER');
             const repo = localStorage.getItem('GH_REPO');
-            if(!token || !owner || !repo) return alert("请先点击齿轮配置 GitHub 参数！");
+            if(!token || !owner || !repo) return alert("请先点击右上角齿轮配置 GitHub 参数！");
             
-            const title = document.getElementById('in-title').value.trim() || "Syntax Analysis";
-            const original = document.getElementById('in-original').value;
-            const analysis = document.getElementById('in-analysis').value;
+            const original = document.getElementById('in-original').value.trim();
+            const analysis = document.getElementById('in-analysis').value.trim();
             
             if(!original || !analysis) return alert("原文和分析均不能为空！");
             
+            // 自动从原文提取标题（取前25个字符）
+            let autoTitle = original.substring(0, 25).replace(/\n/g, ' ');
+            if (original.length > 25) autoTitle += '...';
+            
             const btn = document.getElementById('pushBtn');
-            btn.innerText = "上传中..."; btn.disabled = true;
+            btn.innerText = "⏳ 上传打包中..."; btn.disabled = true;
             
             // 组装带自修改逻辑的极客模板
-            const targetHtml = generateTemplate(title, original, analysis);
+            const targetHtml = generateTemplate(autoTitle, original, analysis);
             
             const now = new Date();
             const y = now.getFullYear(), m = String(now.getMonth()+1), d = String(now.getDate());
@@ -216,16 +237,17 @@
                     method: 'PUT',
                     headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        message: `Add syntax analysis: ${title}`,
+                        message: `Matrix Update: ${autoTitle}`,
                         content: btoa(unescape(encodeURIComponent(targetHtml)))
                     })
                 });
                 
                 if(res.ok) {
-                    alert("🎉 推送成功！云端打工人正在生成日历...");
-                    document.getElementById('in-title').value = '';
+                    alert("🎉 推送成功！云端打工人正在重新编译日历...");
                     document.getElementById('in-original').value = '';
                     document.getElementById('in-analysis').value = '';
+                    // 自动滑回第一页
+                    document.getElementById('viewport').scrollTo({ left: 0, behavior: 'smooth' });
                 } else {
                     const err = await res.json();
                     alert("❌ 失败: " + err.message);
@@ -235,7 +257,7 @@
             btn.innerText = "🚀 推送至云端矩阵"; btn.disabled = false;
         }
 
-        // 超强独立模板生成器
+        // 超强独立模板生成器（修复了 script 解析拦截 BUG）
         function generateTemplate(title, orig, anal) {
             const safeOrig = orig.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             const safeAnal = anal.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -246,45 +268,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>${title}</title>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"><\/script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></scr` + `ipt>
     <style>
         :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: #2980b9; --highlight: #fef9e7; }
         body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; margin: 0; padding: 20px; }
         .container { max-width: 700px; margin: 0 auto; }
-        .nav-back { margin-bottom: 20px; }
-        .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 6px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; }
+        .nav-back { margin-bottom: 25px; }
+        .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .card-header { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;}
+        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold;}
         
         /* Markdown 老师批改样式 */
-        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 25px; margin-bottom: 10px; font-weight: 600; }
-        .markdown-body h3 { font-size: 1.15rem; }
-        .markdown-body p { margin-top: 0; margin-bottom: 15px; font-size: 1.05rem; }
-        .markdown-body blockquote { margin: 0 0 15px 0; padding: 10px 15px; background: var(--highlight); border-left: 4px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.1rem; border-radius: 0 8px 8px 0; }
+        .markdown-body { font-size: 1.05rem; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 25px; margin-bottom: 12px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
+        .markdown-body h3 { font-size: 1.2rem; }
+        .markdown-body p { margin-top: 0; margin-bottom: 15px; }
+        .markdown-body blockquote { margin: 0 0 15px 0; padding: 12px 18px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.15rem; border-radius: 0 8px 8px 0; }
         .markdown-body hr { border: 0; border-top: 1px dashed #bdc3c7; margin: 25px 0; }
         .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.95rem; }
-        .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+        .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 12px; text-align: left; }
         .markdown-body th { background: #f8f9fa; color: var(--accent); }
         
         /* 交互反馈 */
         .view-mode.editing { display: none; }
         .edit-mode { display: none; }
         .edit-mode.active { display: block; }
-        .edit-textarea { width: 100%; min-height: 150px; padding: 12px; font-family: monospace; font-size: 14px; border: 2px dashed var(--accent); border-radius: 8px; box-sizing: border-box; resize: vertical; margin-bottom: 10px; }
-        .save-btn { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .cancel-btn { background: #ecf0f1; color: #333; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; margin-left: 10px; }
+        .edit-textarea { width: 100%; min-height: 150px; padding: 15px; font-family: monospace; font-size: 15px; border: 2px dashed var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; margin-bottom: 15px; background: #fafafa; }
+        .edit-textarea:focus { outline: none; background: #fff; border-style: solid; }
+        .save-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        .cancel-btn { background: #ecf0f1; color: #333; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-left: 10px; font-size: 1rem; font-weight: bold;}
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="nav-back"><a href="../../index.html">🔙 枢纽</a></div>
+        <div class="nav-back"><a href="../../index.html">🔙 返回矩阵枢纽</a></div>
         
-        <script id="raw-original" type="text/markdown">${safeOrig}<\/script>
-        <script id="raw-analysis" type="text/markdown">${safeAnal}<\/script>
+        <!-- 存储原始数据的脚本块（绝对安全隔离） -->
+        <script id="raw-original" type="text/markdown">${safeOrig}</scr` + `ipt>
+        <script id="raw-analysis" type="text/markdown">${safeAnal}</scr` + `ipt>
 
+        <!-- 原文区块 -->
         <div class="card" id="block-original">
-            <div class="card-header"><span>📖 原始文本 (Original)</span> <span style="font-size:0.7rem;">双指轻触编辑</span></div>
+            <div class="card-header"><span>📖 原始文本 (Original)</span> <span style="font-size:0.75rem; background:#eee; padding:2px 8px; border-radius:10px;">双指轻触编辑</span></div>
             <div id="view-original" class="view-mode markdown-body"></div>
             <div id="edit-original" class="edit-mode">
                 <textarea class="edit-textarea" id="textarea-original"></textarea>
@@ -293,8 +319,9 @@
             </div>
         </div>
 
+        <!-- 深度分析区块 -->
         <div class="card" id="block-analysis">
-            <div class="card-header"><span>🔬 深度解构 (Analysis)</span> <span style="font-size:0.7rem;">双指轻触编辑</span></div>
+            <div class="card-header"><span>🔬 深度解构 (Analysis)</span> <span style="font-size:0.75rem; background:#eee; padding:2px 8px; border-radius:10px;">双指轻触编辑</span></div>
             <div id="view-analysis" class="view-mode markdown-body"></div>
             <div id="edit-analysis" class="edit-mode">
                 <textarea class="edit-textarea" id="textarea-analysis"></textarea>
@@ -360,7 +387,7 @@
                 return;
             }
 
-            // 获取当前文件在 GitHub 的相对路径及 SHA (覆盖需要 SHA)
+            // 获取当前文件在 GitHub 的相对路径
             const path = window.location.pathname;
             const fileRelPath = path.substring(path.indexOf('docs/'));
             
@@ -376,7 +403,7 @@
                     method: 'PUT',
                     headers: { 'Authorization': \`token \${token}\`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        message: \`Update \${target} analysis\`,
+                        message: \`Update \${target} analysis via double-tap\`,
                         content: btoa(unescape(encodeURIComponent(newHtml))),
                         sha: fileData.sha
                     })
@@ -386,16 +413,17 @@
                     // 更新成功，退出编辑模式并重新渲染
                     cancelEdit(target);
                     renderAll();
-                    alert("✅ 云端同步成功！页面已刷新。");
+                    alert("✅ 云端同步成功！这篇讲义已被永久更新。");
                 } else {
-                    alert("同步失败，请检查网络或 Token 权限。");
+                    const err = await putRes.json();
+                    alert("同步失败: " + err.message);
                 }
             } catch(e) {
                 alert("发生错误: " + e.message);
             }
             btn.innerText = '💾 保存修改并推送';
         }
-    </script>
+    </scr` + `ipt>
 </body>
 </html>`;
         }
