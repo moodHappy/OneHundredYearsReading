@@ -1,9 +1,12 @@
 import os
 import json
+import re
+import base64
 
 BASE_DIR = "docs"
 
-# 统一维护的独立笔记页面模板
+# 统一由 Python 维护的独立页面模板
+# 所有的 CSS 样式、排版引擎全在这里，再也不用受制于油猴的浏览器内存限制！
 ARTICLE_TEMPLATE = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -65,31 +68,33 @@ ARTICLE_TEMPLATE = """<!DOCTYPE html>
             <div id="edit-control-block" class="edit-control-block">
                 <textarea id="edit-analysis" class="edit-textarea"></textarea>
                 <div class="control-btn-row">
-                    <button class="action-btn btn-save" onclick="saveEdit()">💾 写入云端数据 (触发重构)</button>
+                    <button class="action-btn btn-save" onclick="saveEdit()">💾 交由 Python 引擎重构</button>
                     <button class="action-btn btn-cancel" onclick="cancelEdit()">取消</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <textarea id="raw-original" style="display:none;">{{ORIGINAL_TEXT}}</textarea>
-    <textarea id="raw-analysis" style="display:none;">{{ANALYSIS_TEXT}}</textarea>
+    <textarea id="raw-data" style="display:none;">{{BASE64_JSON_DATA}}</textarea>
 
     <script>
         const GH_OWNER = "moodHappy"; 
         const GH_REPO = "OneHundredYearsReading";
-        const jsonRelPath = "{{JSON_REL_PATH}}";
 
         function renderAll() {
-            const analContent = document.getElementById('raw-analysis').value;
-            try { 
+            try {
+                const b64Str = document.getElementById('raw-data').value.trim();
+                const rawDataStr = decodeURIComponent(escape(atob(b64Str)));
+                const data = JSON.parse(rawDataStr);
+                const analContent = data.analysis || '';
+                
                 if (typeof marked !== 'undefined') {
                     document.getElementById('view-analysis').innerHTML = marked.parse ? marked.parse(analContent) : marked(analContent); 
                 } else {
                     document.getElementById('view-analysis').innerHTML = "<pre style='white-space:pre-wrap'>" + analContent + "</pre>";
                 }
             } catch(e) {
-                document.getElementById('view-analysis').innerHTML = "<pre style='white-space:pre-wrap'>" + analContent + "</pre>";
+                console.error("解析数据失败", e);
             }
         }
         window.onload = renderAll;
@@ -105,7 +110,10 @@ ARTICLE_TEMPLATE = """<!DOCTYPE html>
         function triggerEdit() {
             viewBlock.style.display = 'none'; 
             editCtrlBlock.style.display = 'block';
-            textarea.value = document.getElementById('raw-analysis').value; 
+            try {
+                const data = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('raw-data').value.trim()))));
+                textarea.value = data.analysis || '';
+            } catch(e) {}
             textarea.focus();
         }
 
@@ -114,59 +122,78 @@ ARTICLE_TEMPLATE = """<!DOCTYPE html>
             viewBlock.style.display = 'block';
         }
 
-        // 直接向后台 Python 推送更新的 JSON！
+        // 修改后的实体提交按钮：它不再上传巨大的 HTML
+        // 而是将新数据打个包，生成一个极简的“等待页”扔给后台的 Python！
         async function saveEdit() {
             const btn = document.querySelector('.btn-save');
             const oldText = btn.innerText;
-            btn.innerText = '📡 正在更新数据...';
+            btn.innerText = '📡 正在推送数据...';
             btn.disabled = true;
             
-            const newText = textarea.value.trim();
             const token = localStorage.getItem('GH_TOKEN'); 
             if(!token) {
+                alert('⚠️ 未检测到 GitHub Token！请先返回主页日历配置。');
                 btn.innerText = oldText; btn.disabled = false;
                 return;
             }
             
-            // 封装发给 Python 的数据
-            const payload = {
-                original: document.getElementById('raw-original').value,
-                analysis: newText,
-                sourceTitle: "{{SOURCE_TITLE}}",
-                sourceUrl: "{{SOURCE_URL}}"
-            };
-            
-            statusMsg.style.display = 'block'; 
-            statusMsg.style.color = '#f39c12'; 
-            statusMsg.innerText = '📡 静默同步中...';
-            
             try {
-                const getRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${jsonRelPath}`, { headers: { 'Authorization': `token ${token}` } });
-                if(!getRes.ok) throw new Error('找不到云端数据源文件');
-                const fileData = await getRes.json();
+                const b64Str = document.getElementById('raw-data').value.trim();
+                const data = JSON.parse(decodeURIComponent(escape(atob(b64Str))));
+                data.analysis = textarea.value.trim(); // 注入新修改的笔记
                 
-                const utf8Encode = new TextEncoder().encode(JSON.stringify(payload, null, 2));
+                const payloadStr = JSON.stringify(data);
+                const newB64Str = btoa(unescape(encodeURIComponent(payloadStr)));
+                
+                // 给后台 Python 发出的信号壳子
+                const minimalHtml = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>编译中...</title></head>
+<body style="padding:40px; font-family:sans-serif; text-align:center; color:#f39c12; background:#fef9e7;">
+    <h2>⏳ Python 引擎正在后台重构此页面...</h2>
+    <p>预计需要 20~30 秒，页面将在编译完成后自动刷新。</p>
+    <textarea id="raw-data" style="display:none;">` + newB64Str + `</textarea>
+    <script>
+        setInterval(() => {
+            fetch(window.location.href, {cache: 'no-store'})
+            .then(r => r.text())
+            .then(html => { if(html.includes('Macondo Matrix')) window.location.reload(); });
+        }, 5000);
+    </scr` + `ipt>
+</body>
+</html>`;
+                
+                statusMsg.style.display = 'block'; 
+                statusMsg.style.color = '#f39c12'; 
+                statusMsg.innerText = '📡 交由 Python 处理中...';
+                
+                const path = window.location.pathname; 
+                const fileRelPath = path.substring(path.indexOf('docs/'));
+                
+                const utf8Encode = new TextEncoder().encode(minimalHtml);
                 const base64Content = btoa(String.fromCodePoint(...utf8Encode));
                 
-                const putRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${jsonRelPath}`, {
-                    method: 'PUT', 
-                    headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: `Update analysis data via UI`, content: base64Content, sha: fileData.sha })
+                const getRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, { headers: { 'Authorization': `token ${token}` } });
+                const fileData = await getRes.json();
+                
+                const putRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, {
+                    method: 'PUT', headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: `Trigger Python Build via UI`, content: base64Content, sha: fileData.sha })
                 });
                 
                 if(putRes.ok) { 
-                    document.getElementById('raw-analysis').value = newText;
-                    cancelEdit(); 
-                    renderAll();
-                    statusMsg.style.color = '#27ae60'; statusMsg.innerText = '✅ 云端数据已更新 (将在30秒后重构网页)'; 
-                    setTimeout(() => statusMsg.style.display = 'none', 5000); 
+                    // 页面瞬间变成等待页，进入全自动轮询模式！
+                    document.open();
+                    document.write(minimalHtml);
+                    document.close();
                 } else { 
-                    statusMsg.style.display = 'none'; 
+                    const eData = await putRes.json(); alert('❌ 同步失败: ' + eData.message); statusMsg.style.display = 'none'; 
+                    btn.innerText = oldText; btn.disabled = false;
                 }
             } catch(e) {
-                statusMsg.style.display = 'none';
+                alert('❌ 错误: ' + e.message); statusMsg.style.display = 'none';
+                btn.innerText = oldText; btn.disabled = false;
             }
-            btn.innerText = oldText; btn.disabled = false;
         }
     </script>
 </body>
@@ -175,7 +202,7 @@ ARTICLE_TEMPLATE = """<!DOCTYPE html>
 def generate_index():
     os.makedirs(BASE_DIR, exist_ok=True)
     
-    print("⚙️ 正在通过 Python 引擎重构《百年孤独》枢纽...")
+    print("⚙️ 正在唤醒 Python 引擎，重构《百年孤独》枢纽...")
     archive_data = {}
     
     if os.path.exists(BASE_DIR):
@@ -191,54 +218,61 @@ def generate_index():
                 if m_int not in archive_data[y_int]:
                     archive_data[y_int][m_int] = {}
                 
-                files = os.listdir(os.path.join(BASE_DIR, year, month))
-                
-                # 仅扫描油猴抓取的原生 JSON 纯净数据文件
-                json_files = sorted([f for f in files if f.endswith('.json')], reverse=True)
-                for json_file in json_files:
-                    file_base = json_file.replace('.json', '')
-                    path_json = os.path.join(BASE_DIR, year, month, json_file)
-                    path_html = os.path.join(BASE_DIR, year, month, f"{file_base}.html")
-                    
-                    parts = file_base.split('_')
+                files = sorted([f for f in os.listdir(os.path.join(BASE_DIR, year, month)) if f.endswith('.html')], reverse=True)
+                for file in files:
+                    parts = file.replace(".html", "").split('_')
                     if len(parts) >= 4:
                         d_int = int(parts[2]) 
                         time_str = f"{parts[3][:2]}:{parts[3][2:4]}"
+                        file_path = os.path.join(BASE_DIR, year, month, file)
                         
                         try:
-                            # 提取原生数据
-                            with open(path_json, 'r', encoding='utf-8') as f:
-                                data = json.load(f)
-                            
-                            orig = data.get('original', '')
-                            anal = data.get('analysis', '')
-                            src_title = data.get('sourceTitle', 'Chapter 1')
-                            src_url = data.get('sourceUrl', '#')
+                            with open(file_path, 'r', encoding='utf-8') as f:
+                                content = f.read()
+                                
+                            # 核心：Python 负责精准提取并展开数据
+                            match = re.search(r'<textarea id="raw-data" style="display:none;">(.*?)</textarea>', content, re.DOTALL)
+                            if match:
+                                b64_str = match.group(1).strip()
+                                # 使用原生库解码 Base64 JSON
+                                raw_json_str = base64.b64decode(b64_str).decode('utf-8')
+                                data = json.loads(raw_json_str)
+                                
+                                orig = data.get('original', '')
+                                src_title = data.get('sourceTitle', 'Source')
+                                src_url = data.get('sourceUrl', '#')
 
-                            # 精准提取前25字符做日历标题，彻底告别默认文字！
-                            title = orig[:25].replace('\n', ' ').strip()
-                            if len(orig) > 25: title += '...'
-                            if not title: title = "📌 语法解构"
+                                # Python 精准计算标题，不再盲目“语法解构”！
+                                title = orig[:25].replace('\n', ' ').strip()
+                                if len(orig) > 25: title += '...'
+                                if not title: title = "📌 摘录解析"
 
-                            # 由 Python 生成极简 HTML 覆盖并更新
-                            safe_orig = orig.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-                            safe_anal = anal.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-                            
-                            html_output = ARTICLE_TEMPLATE.replace('{{TITLE}}', title) \
-                                                          .replace('{{SOURCE_TITLE}}', src_title) \
-                                                          .replace('{{SOURCE_URL}}', src_url) \
-                                                          .replace('{{ORIGINAL_TEXT}}', safe_orig) \
-                                                          .replace('{{ANALYSIS_TEXT}}', safe_anal) \
-                                                          .replace('{{JSON_REL_PATH}}', f"docs/{year}/{month}/{json_file}")
-                            
-                            with open(path_html, 'w', encoding='utf-8') as f_html:
-                                f_html.write(html_output)
+                                # 处理转义符，准备覆盖 HTML
+                                safe_orig = orig.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+                                
+                                html_output = ARTICLE_TEMPLATE.replace('{{TITLE}}', title) \
+                                                              .replace('{{SOURCE_TITLE}}', src_title) \
+                                                              .replace('{{SOURCE_URL}}', src_url) \
+                                                              .replace('{{ORIGINAL_TEXT}}', safe_orig) \
+                                                              .replace('{{BASE64_JSON_DATA}}', b64_str)
+                                
+                                # Python 重构：覆盖极简壳子，输出终极华丽版 HTML！
+                                with open(file_path, 'w', encoding='utf-8') as f_out:
+                                    f_out.write(html_output)
+                                    
+                            else:
+                                # 万一有没被重构的遗留老旧文件
+                                title = "📌 旧版摘录"
+                                start = content.find('<title>')
+                                end = content.find('</title>')
+                                if start != -1 and end != -1:
+                                    title = content[start+7:end]
 
                             if d_int not in archive_data[y_int][m_int]:
                                 archive_data[y_int][m_int][d_int] = []
-                            archive_data[y_int][m_int][d_int].append({"time": time_str, "path": f"{year}/{month}/{file_base}.html", "title": title})
+                            archive_data[y_int][m_int][d_int].append({"time": time_str, "path": f"{year}/{month}/{file}", "title": title})
                         except Exception as e:
-                            print(f"解析 JSON 错误 {json_file}: {e}")
+                            print(f"解析文件出错 {file}: {e}")
 
     json_data = json.dumps(archive_data)
 
@@ -399,7 +433,7 @@ def generate_index():
 
     with open(os.path.join(BASE_DIR, "index.html"), "w", encoding="utf-8") as f:
         f.write(index_html.replace("REPLACEME_JSON_DATA", json_data))
-    print("🚀 《百年孤独》数据底座与前端面板构建完毕！")
+    print("🚀 《百年孤独》数据底座与前端面板已重组！")
 
 if __name__ == "__main__":
     generate_index()
