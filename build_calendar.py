@@ -9,7 +9,6 @@ def generate_index():
     print("⚙️ 正在重新编译《百年孤独》专属解构枢纽...")
     archive_data = {}
     
-    # 扫描年份文件夹
     if os.path.exists(BASE_DIR):
         years = [d for d in os.listdir(BASE_DIR) if d.isdigit()]
         for year in years:
@@ -29,7 +28,8 @@ def generate_index():
                         parts = file.replace(".html", "").split('_')
                         if len(parts) >= 4:
                             d_int = int(parts[2]) 
-                            time_str = f"{parts[3][:2]}:{parts[3][2:]}"
+                            # 修复时间 BUG：严格截取时和分，抛弃尾部的秒数 [2:4]
+                            time_str = f"{parts[3][:2]}:{parts[3][2:4]}"
                             file_path = f"{year}/{month}/{file}"
                             
                             title = "📌 语法解构"
@@ -48,7 +48,6 @@ def generate_index():
 
     json_data = json.dumps(archive_data)
 
-    # 移除了前台表单录入页和置顶目录，极其纯粹的单页日历面板
     html_content = """<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -79,7 +78,6 @@ def generate_index():
         .dot { width: 5px; height: 5px; background: var(--primary); border-radius: 50%; position: absolute; bottom: 5px; display: none; }
         .day-cell.has-news .dot { display: block; }
         
-        /* 极致清爽的一行流行表排版 */
         .feed-list { display: flex; flex-direction: column; gap: 12px; }
         .feed-item { background: var(--card); padding: 16px 18px; border-radius: 12px; text-decoration: none; color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; flex-direction: row; align-items: center; gap: 15px; transition: transform 0.2s; border: 1px solid transparent; }
         .feed-item:active { transform: scale(0.98); background: #fafafa; }
