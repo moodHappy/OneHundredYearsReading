@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A burning noonday sun bro...</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: #f39c12; --highlight: #fef9e7; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; padding-bottom: 50px;}
+        .nav-back { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
+        .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .sync-status { font-size: 0.85rem; color: #27ae60; font-weight: bold; display: none; }
+
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px dashed var(--border); padding-bottom: 8px; margin-bottom: 12px; font-weight: bold;}
+
+        .markdown-body { font-size: 1.05rem; line-height: 1.6; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
+        .markdown-body h3 { font-size: 1.15rem; }
+        .markdown-body p { margin-top: 0; margin-bottom: 8px; }
+        .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 8px; padding-left: 20px; }
+        .markdown-body li { margin-bottom: 4px; }
+        .markdown-body li p { margin: 0; }
+        .markdown-body p:empty { display: none; }
+        .markdown-body br + br { display: none; }
+        .markdown-body blockquote { margin: 0 0 10px 0; padding: 10px 15px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.1rem; border-radius: 0 8px 8px 0; }
+        .markdown-body blockquote p { margin-bottom: 0; }
+
+        /* 编辑面板控制样式 */
+        .edit-control-block { display: none; background: #fff; border-radius: 10px; margin-top: 10px; }
+        .edit-textarea { width: 100%; min-height: 250px; padding: 15px; font-family: monospace; font-size: 1.05rem; border: 2px solid var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; background: #fff; color: #2c3e50; line-height: 1.5; outline: none; box-shadow: 0 4px 15px rgba(243,156,18,0.1);}
+        .control-btn-row { display: flex; gap: 10px; margin-top: 10px; }
+        .action-btn { border: none; padding: 10px 22px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
+        .btn-save { background: var(--accent); color: white; flex: 1; }
+        .btn-cancel { background: #ecf0f1; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="../../index.html">🔙 返回矩阵枢纽</a>
+            <span class="sync-status" id="sync-status">📡 同步中...</span>
+        </div>
+
+        <textarea id="raw-original" style="display:none;">A burning noonday sun brought out a startling demonstration with the gigantic magnifying glass: they put a pile of dry hay in the middle of the street and set it on fire by concentrating the sun&#039;s rays.</textarea>
+        <textarea id="raw-analysis" style="display:none;"># 📘 英语教学式讲解（逐句拆解）
+
+## 1. A Venezuelan mother has died while saving her daughter
+- **A Venezuelan mother**：一位委内瑞拉母亲  
+  - Venezuelan = 国籍形容词  
+- **has died**：现在完成时  
+  - 强调“刚发生的死亡事件 + 现实影响仍在延续”  
+- **while saving her daughter**：
+  - while + doing：在……过程中  
+  - saving her daughter：救她女儿  
+
+📌 语义核心：
+- “死亡”发生在“拯救行为进行中”  
+- 构成典型的“牺牲型叙事结构”
+
+---
+
+## 2. during the earthquakes that hit the country
+- **during**：在……期间（时间背景）  
+- **the earthquakes**：地震（复数 → 表示连续/多次震动）  
+- **that hit the country**：
+  - 定语从句修饰 earthquakes  
+  - hit = 袭击 / 造成冲击  
+
+📌 语义核心：
+- 灾难作为背景框架  
+- 强化事件的不可控性与规模
+
+---
+
+## 3. according to footballer Héctor Bello and local media
+- **according to**：根据……  
+- **footballer Héctor Bello**：
+  - footballer = 职业身份（足球运动员）  
+- **local media**：当地媒体  
+
+📌 语义核心：
+- 双重信息来源：
+  - 个人证词（Bello）  
+  - 媒体报道（local media）  
+- 增强新闻可信度与客观性
+
+---
+
+# 📚 整句结构总结（新闻英语框架）
+
+这是一句典型新闻报道句，结构清晰：
+
+## 🧩 信息结构
+- 主事件：A mother has died  
+- 方式/情境：while saving her daughter  
+- 背景：during earthquakes  
+- 来源：according to X and Y  
+
+---
+
+## 🧠 叙事特点
+- 个体悲剧（母亲死亡）  
+- 英雄行为（救女儿）  
+- 灾难背景（地震）  
+- 信息多源验证（人物 + 媒体）
+
+---
+
+## 📌 语言风格
+- 客观、压缩、高信息密度  
+- 无情感词直接评价，但情绪通过结构自然产生  
+- 典型新闻英语写法（事实优先）
+
+---
+
+# 📌 Key Expressions（板书 / Anki）
+
+- has died while doing sth —— 在做某事时去世  
+- during the earthquakes —— 在地震期间  
+- that hit the country —— 袭击该国的（地震）  
+- according to —— 根据  
+- local media —— 当地媒体</textarea>
+
+        <div class="card">
+            <div class="card-header">📖 原始摘录 (Original Text)</div>
+            <div id="view-original" class="markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;"></div>
+        </div>
+
+        <div class="card" id="block-analysis">
+            <div class="card-header">🔬 深度解构 (Analysis) <span style="font-size: 0.75rem; color: #bbb; float: right; font-weight: normal;">双指轻触编辑</span></div>
+            <div id="view-analysis" class="markdown-body"></div>
+
+            <div id="edit-control-block" class="edit-control-block">
+                <textarea id="edit-analysis" class="edit-textarea"></textarea>
+                <div class="control-btn-row">
+                    <button class="action-btn btn-save" onclick="saveEdit()">💾 保存并同步云端</button>
+                    <button class="action-btn btn-cancel" onclick="cancelEdit()">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GH_OWNER = "moodHappy";
+        const GH_REPO = "OneHundredYearsReading";
+
+        function renderAll() {
+            document.getElementById('view-original').textContent = document.getElementById('raw-original').value;
+            const analContent = document.getElementById('raw-analysis').value;
+            try {
+                if (typeof marked !== 'undefined') {
+                    document.getElementById('view-analysis').innerHTML = marked.parse(analContent);
+                }
+            } catch(e) {}
+        }
+        window.onload = renderAll;
+
+        const viewBlock = document.getElementById('view-analysis');
+        const editCtrlBlock = document.getElementById('edit-control-block');
+        const textarea = document.getElementById('edit-analysis');
+        const statusMsg = document.getElementById('sync-status');
+
+        viewBlock.addEventListener('dblclick', triggerEdit);
+        viewBlock.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEdit(); });
+
+        function triggerEdit() {
+            viewBlock.style.display = 'none';
+            editCtrlBlock.style.display = 'block';
+            textarea.value = document.getElementById('raw-analysis').value;
+            textarea.focus();
+        }
+
+        function cancelEdit() {
+            editCtrlBlock.style.display = 'none';
+            viewBlock.style.display = 'block';
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        // 使用最高级的网页快照技术，彻底杜绝崩溃死循环
+        async function saveEdit() {
+            const btn = document.querySelector('.btn-save');
+            const oldText = btn.innerText;
+            btn.innerText = '📡 正在覆盖...';
+            btn.disabled = true;
+
+            const newText = textarea.value.trim();
+            const token = localStorage.getItem('GH_TOKEN');
+            if(!token) {
+                alert('⚠️ 未检测到 GitHub Token！数据暂存本地。
+请先返回主页日历，点击右上角齿轮完成 Token 配置！');
+                btn.innerText = oldText; btn.disabled = false;
+                return;
+            }
+
+            statusMsg.style.display = 'block';
+            statusMsg.style.color = '#f39c12';
+            statusMsg.innerText = '📡 静默同步中...';
+
+            // 1. 恢复静态 UI，并更新底层隐藏的 textarea 数据
+            document.getElementById('raw-analysis').value = newText;
+            document.getElementById('raw-analysis').textContent = escapeHTML(newText);
+            btn.innerText = oldText;
+            btn.disabled = false;
+            cancelEdit();
+            renderAll();
+
+            // 临时隐藏顶部状态文字，防止被一起截图存进源码
+            statusMsg.style.display = 'none';
+
+            // 2. 核心技术：直接克隆整个重构后的网页代码！
+            const htmlSnapshot = "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n" + document.documentElement.outerHTML + "\n</html>";
+
+            // 显示给用户看的进度
+            statusMsg.style.display = 'block';
+
+            const path = window.location.pathname;
+            const fileRelPath = path.substring(path.indexOf('docs/'));
+
+            try {
+                // 原生安全转码 Base64，杜绝超出栈内存崩溃
+                const utf8Encode = new TextEncoder().encode(htmlSnapshot);
+                const base64Html = btoa(String.fromCodePoint(...utf8Encode));
+
+                const getRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, { headers: { 'Authorization': `token ${token}` } });
+                const fileData = await getRes.json();
+
+                const putRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, {
+                    method: 'PUT', headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: `Manual update via click submit button`, content: base64Html, sha: fileData.sha })
+                });
+
+                if(putRes.ok) {
+                    statusMsg.style.color = '#27ae60'; statusMsg.innerText = '✅ 云端已同步';
+                    setTimeout(() => statusMsg.style.display = 'none', 3000);
+                } else {
+                    const eData = await putRes.json(); alert('❌ 同步失败: ' + eData.message); statusMsg.style.display = 'none';
+                }
+            } catch(e) {
+                alert('❌ 网络错误: ' + e.message); statusMsg.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
