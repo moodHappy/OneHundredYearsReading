@@ -5,23 +5,23 @@ BASE_DIR = "docs"
 
 def generate_index():
     os.makedirs(BASE_DIR, exist_ok=True)
-    
+
     print("⚙️ 正在重新编译全栈语法枢纽...")
     archive_data = {}
-    
+
     # 扫描年份文件夹
     years = [d for d in os.listdir(BASE_DIR) if d.isdigit()]
     for year in years:
         y_int = int(year) 
         if y_int not in archive_data:
             archive_data[y_int] = {}
-            
+
         months = [d for d in os.listdir(os.path.join(BASE_DIR, year)) if d.isdigit()]
         for month in months:
             m_int = int(month) 
             if m_int not in archive_data[y_int]:
                 archive_data[y_int][m_int] = {}
-                
+
             files = sorted([f for f in os.listdir(os.path.join(BASE_DIR, year, month)) if f.endswith('.html')], reverse=True)
             for file in files:
                 try:
@@ -30,7 +30,7 @@ def generate_index():
                         d_int = int(parts[2]) 
                         time_str = f"{parts[3][:2]}:{parts[3][2:]}"
                         file_path = f"{year}/{month}/{file}"
-                        
+
                         title = "📌 语法解构"
                         with open(os.path.join(BASE_DIR, year, month, file), 'r', encoding='utf-8') as f_html:
                             content = f_html.read(2000)
@@ -52,7 +52,7 @@ def generate_index():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Syntax Matrix 枢纽</title>
+    <title>Macondo Matrix 枢纽</title>
     <style>
         :root { --bg: #f5f5f7; --primary: #2980b9; --accent: #f1c40f; --card: #ffffff; --border: #e0e0e0; --text: #333; }
         body, html { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); height: 100%; overflow: hidden; }
@@ -111,7 +111,7 @@ def generate_index():
         <div class="page" id="page-1">
             <div class="container">
                 <div class="header">
-                    <h1><span>Syntax</span> Matrix</h1>
+                    <h1><span>Macondo</span> Matrix</h1>
                     <p>句子解构与语法实验室</p>
                     <button class="settings-btn" onclick="document.getElementById('modal').style.display='flex'">⚙️</button>
                 </div>
@@ -292,7 +292,7 @@ def generate_index():
                     method: 'PUT',
                     headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        message: `Syntax Matrix Record: ${autoTitle}`,
+                        message: `Macondo Matrix Record: ${autoTitle}`,
                         content: base64Html
                     })
                 });
