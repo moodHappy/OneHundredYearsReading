@@ -5,6 +5,7 @@ on:
     paths:
       - 'docs/**/*.html'
       - '!docs/index.html' # 避开主页自身的更新，防止死循环
+      - 'build_calendar.py' # 监听构建脚本的更新，有新版直接触发
   workflow_dispatch:
 
 jobs:
