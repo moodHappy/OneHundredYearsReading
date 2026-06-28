@@ -19,7 +19,6 @@
         .header p { margin: 0; font-size: 0.9rem; color: #7f8c8d; letter-spacing: 1px; }
         .settings-btn { position: absolute; right: 0; top: 20px; background: none; border: none; font-size: 1.4rem; cursor: pointer; opacity: 0.8; }
         
-        /* 日历样式 */
         .controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
         .select-box { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-weight: bold; background: var(--card); color: var(--primary); }
         .calendar-wrapper { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; }
@@ -40,7 +39,6 @@
         .feed-time { font-family: monospace; color: #7f8c8d; font-size: 0.85rem; }
         .feed-title { font-weight: bold; font-size: 1.05rem; }
         
-        /* 录入表单样式 */
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: var(--primary); font-size: 0.95rem; }
         .form-control { width: 100%; box-sizing: border-box; padding: 15px; border: 1px solid var(--border); border-radius: 10px; font-size: 1rem; font-family: inherit; resize: vertical; background: var(--card); }
@@ -50,7 +48,6 @@
         .btn-push:active { transform: scale(0.98); background: #2471a3; }
         .btn-push:disabled { background: #95a5a6; cursor: not-allowed; box-shadow: none; }
         
-        /* 模态框 */
         .modal { display: none; position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(4px); }
         .modal-content { background: #fff; padding: 25px; border-radius: 16px; width: 100%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .modal-content input { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
@@ -118,7 +115,13 @@
     </div>
 
     <script>
-        // --- 1. 日历渲染逻辑 ---
+        // --- 初始化自动检查 Token ---
+        window.onload = function() {
+            if (!localStorage.getItem('GH_TOKEN') || !localStorage.getItem('GH_REPO')) {
+                document.getElementById('modal').style.display = 'flex';
+            }
+        };
+
         const archiveData = {};
         const today = new Date();
         let sY = today.getFullYear(), sM = today.getMonth() + 1, sD = today.getDate();
@@ -141,14 +144,12 @@
             daysGrid.innerHTML = '';
             let firstDay = new Date(sY, sM - 1, 1).getDay();
             if (firstDay === 0) firstDay = 7;
-            
             const daysInMonth = new Date(sY, sM, 0).getDate();
             
             for(let i=1; i<firstDay; i++) {
                 daysGrid.innerHTML += '<div class="day-cell empty"></div>';
             }
             
-            // 重点修复：现在从 archiveData 取出来的是完美匹配的纯数字键值
             const monthData = (archiveData[sY] && archiveData[sY][sM]) || {};
             for(let d=1; d<=daysInMonth; d++) {
                 const hasNews = monthData[d] && monthData[d].length > 0;
@@ -185,7 +186,6 @@
         renderCalendar(); 
         renderList();
 
-        // --- 2. 配置管理 ---
         function saveSettings() {
             localStorage.setItem('GH_TOKEN', document.getElementById('gh-token').value.trim());
             localStorage.setItem('GH_OWNER', document.getElementById('gh-owner').value.trim());
@@ -196,19 +196,20 @@
         document.getElementById('gh-owner').value = localStorage.getItem('GH_OWNER') || '';
         document.getElementById('gh-repo').value = localStorage.getItem('GH_REPO') || '';
 
-        // --- 3. 生成自包含的 HTML 结构并推送 ---
         async function pushToGitHub() {
             const token = localStorage.getItem('GH_TOKEN');
             const owner = localStorage.getItem('GH_OWNER');
             const repo = localStorage.getItem('GH_REPO');
-            if(!token || !owner || !repo) return alert("配置缺失！请先点击主页右上角齿轮，填写你的 GitHub Token、用户名和仓库名！");
+            if(!token || !owner || !repo) {
+                document.getElementById('modal').style.display='flex';
+                return;
+            }
             
             const original = document.getElementById('in-original').value.trim();
             const analysis = document.getElementById('in-analysis').value.trim();
             
             if(!original || !analysis) return alert("原文和分析均不能为空！");
             
-            // 自动从原文提取标题（取前25个字符）
             let autoTitle = original.substring(0, 25).replace(/\n/g, ' ');
             if (original.length > 25) autoTitle += '...';
             
@@ -224,7 +225,6 @@
             const h = String(now.getHours()).padStart(2, '0');
             const mn = String(now.getMinutes()).padStart(2, '0');
             
-            // 路径绝对规范：按年/月建文件夹
             const filePath = `docs/${y}/${m}/${y}_${m}_${d}_${h}${mn}.html`;
             
             try {
@@ -238,7 +238,7 @@
                 });
                 
                 if(res.ok) {
-                    alert("🎉 矩阵记录成功！GitHub 云端流水线已启动，请等待几秒钟让日历自动刷新！");
+                    alert("🎉 矩阵记录成功！云端流水线已启动，日历将在稍后自动刷新！");
                     document.getElementById('in-original').value = '';
                     document.getElementById('in-analysis').value = '';
                     document.getElementById('viewport').scrollTo({ left: 0, behavior: 'smooth' });
@@ -251,9 +251,10 @@
             btn.innerText = "🚀 推送至云端矩阵"; btn.disabled = false;
         }
 
+        // 终极防崩溃：采用隐藏的 JSON Base64 数据桥接生成独立页面
         function generateTemplate(title, orig, anal) {
-            const safeOrig = orig.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            const safeAnal = anal.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const dataObj = { title: title, orig: orig, anal: anal };
+            const b64Data = btoa(unescape(encodeURIComponent(JSON.stringify(dataObj))));
             
             return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -265,14 +266,13 @@
     <style>
         :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: #2980b9; --highlight: #fef9e7; }
         body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; margin: 0; padding: 20px; }
-        .container { max-width: 700px; margin: 0 auto; }
+        .container { max-width: 700px; margin: 0 auto; padding-bottom: 50px;}
         .nav-back { margin-bottom: 25px; }
         .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold;}
+        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; font-weight: bold;}
         
-        /* Markdown 老师批改样式 */
         .markdown-body { font-size: 1.05rem; }
         .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 25px; margin-bottom: 12px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
         .markdown-body h3 { font-size: 1.2rem; }
@@ -283,11 +283,11 @@
         .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 12px; text-align: left; }
         .markdown-body th { background: #f8f9fa; color: var(--accent); }
         
-        /* 交互反馈 */
+        /* 编辑模式交互 */
         .view-mode.editing { display: none; }
         .edit-mode { display: none; }
         .edit-mode.active { display: block; }
-        .edit-textarea { width: 100%; min-height: 150px; padding: 15px; font-family: monospace; font-size: 15px; border: 2px dashed var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; margin-bottom: 15px; background: #fafafa; }
+        .edit-textarea { width: 100%; min-height: 250px; padding: 15px; font-family: monospace; font-size: 15px; border: 2px dashed var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; margin-bottom: 15px; background: #fafafa; }
         .edit-textarea:focus { outline: none; background: #fff; border-style: solid; }
         .save-btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; }
         .cancel-btn { background: #ecf0f1; color: #333; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-left: 10px; font-size: 1rem; font-weight: bold;}
@@ -297,64 +297,73 @@
     <div class="container">
         <div class="nav-back"><a href="../../index.html">🔙 返回矩阵枢纽</a></div>
         
-        <script id="raw-original" type="text/markdown">${safeOrig}</scr` + `ipt>
-        <script id="raw-analysis" type="text/markdown">${safeAnal}</scr` + `ipt>
+        <script id="page-data" type="application/base64">${b64Data}</scr` + `ipt>
 
         <div class="card" id="block-original">
-            <div class="card-header"><span>📖 原始文本 (Original)</span> <span style="font-size:0.75rem; background:#eee; padding:2px 8px; border-radius:10px;">双指轻触编辑</span></div>
-            <div id="view-original" class="view-mode markdown-body"></div>
-            <div id="edit-original" class="edit-mode">
-                <textarea class="edit-textarea" id="textarea-original"></textarea>
-                <button class="save-btn" onclick="saveEdit('original')">💾 保存修改并推送</button>
-                <button class="cancel-btn" onclick="cancelEdit('original')">取消</button>
-            </div>
+            <div class="card-header">📖 原始文本 (Original)</div>
+            <div id="view-original" class="view-mode markdown-body" style="white-space: pre-wrap; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; color: #34495e;"></div>
         </div>
 
         <div class="card" id="block-analysis">
-            <div class="card-header"><span>🔬 深度解构 (Analysis)</span> <span style="font-size:0.75rem; background:#eee; padding:2px 8px; border-radius:10px;">双指轻触编辑</span></div>
+            <div class="card-header">🔬 深度解构 (Analysis)</div>
             <div id="view-analysis" class="view-mode markdown-body"></div>
             <div id="edit-analysis" class="edit-mode">
                 <textarea class="edit-textarea" id="textarea-analysis"></textarea>
-                <button class="save-btn" onclick="saveEdit('analysis')">💾 保存修改并推送</button>
-                <button class="cancel-btn" onclick="cancelEdit('analysis')">取消</button>
+                <div style="display:flex;">
+                    <button class="save-btn" onclick="saveEdit()">💾 保存并更新云端</button>
+                    <button class="cancel-btn" onclick="cancelEdit()">取消</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        function renderAll() {
-            document.getElementById('view-original').innerHTML = marked.parse(document.getElementById('raw-original').textContent);
-            document.getElementById('view-analysis').innerHTML = marked.parse(document.getElementById('raw-analysis').textContent);
-        }
-        renderAll();
+        // 解析底层数据
+        let pageData = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('page-data').textContent))));
 
-        ['original', 'analysis'].forEach(target => {
-            const viewBlock = document.getElementById('view-' + target);
-            viewBlock.addEventListener('dblclick', () => triggerEdit(target));
-            let lastTap = 0;
-            viewBlock.addEventListener('touchstart', e => {
-                if (e.touches.length === 2) triggerEdit(target); 
-            });
+        function renderAll() {
+            document.getElementById('view-original').textContent = pageData.orig;
+            if (typeof marked !== 'undefined') {
+                document.getElementById('view-analysis').innerHTML = marked.parse(pageData.anal);
+            } else {
+                document.getElementById('view-analysis').innerHTML = "<pre style='white-space:pre-wrap;'>" + pageData.anal + "</pre>";
+            }
+        }
+        window.onload = renderAll;
+
+        // 仅对分析区块赋予双指/双击魔法
+        const viewBlock = document.getElementById('view-analysis');
+        const editBlock = document.getElementById('edit-analysis');
+        const textarea = document.getElementById('textarea-analysis');
+
+        viewBlock.addEventListener('dblclick', triggerEdit);
+        let lastTap = 0;
+        viewBlock.addEventListener('touchstart', e => {
+            if (e.touches.length === 2) triggerEdit(); 
         });
 
-        function triggerEdit(target) {
-            document.getElementById('view-' + target).classList.add('editing');
-            const editBlock = document.getElementById('edit-' + target);
+        function triggerEdit() {
+            viewBlock.classList.add('editing');
             editBlock.classList.add('active');
-            document.getElementById('textarea-' + target).value = document.getElementById('raw-' + target).textContent;
+            textarea.value = pageData.anal;
         }
 
-        function cancelEdit(target) {
-            document.getElementById('view-' + target).classList.remove('editing');
-            document.getElementById('edit-' + target).classList.remove('active');
+        function cancelEdit() {
+            viewBlock.classList.remove('editing');
+            editBlock.classList.remove('active');
         }
 
-        async function saveEdit(target) {
-            const btn = document.querySelector('#edit-' + target + ' .save-btn');
-            btn.innerText = '📡 正在同步...';
+        async function saveEdit() {
+            const btn = document.querySelector('.save-btn');
+            btn.innerText = '📡 正在覆盖...';
             
-            const newContent = document.getElementById('textarea-' + target).value;
-            document.getElementById('raw-' + target).textContent = newContent;
+            // 提取新内容并更新底层保险箱
+            pageData.anal = textarea.value;
+            document.getElementById('page-data').textContent = btoa(unescape(encodeURIComponent(JSON.stringify(pageData))));
+            
+            // 恢复视图
+            cancelEdit();
+            renderAll();
             
             const newHtml = "<!DOCTYPE html>\n<html lang=\"zh-CN\">\n" + document.documentElement.innerHTML + "\n</html>";
             
@@ -364,7 +373,7 @@
             
             if(!token) {
                 alert("未检测到 GitHub Token。请回主页枢纽点击齿轮配置！");
-                btn.innerText = '💾 保存修改并推送';
+                btn.innerText = '💾 保存并更新云端';
                 return;
             }
 
@@ -381,23 +390,22 @@
                     method: 'PUT',
                     headers: { 'Authorization': \`token \${token}\`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        message: \`Update \${target} analysis via UI\`,
+                        message: \`Update analysis via UI\`,
                         content: btoa(unescape(encodeURIComponent(newHtml))),
                         sha: fileData.sha
                     })
                 });
                 
                 if(putRes.ok) {
-                    cancelEdit(target);
-                    renderAll();
-                    alert("✅ 云端同步成功！页面已刷新。");
+                    alert("✅ 云端同步成功！页面已被永久更新。");
                 } else {
-                    alert("同步失败，请检查网络或 Token 权限。");
+                    const err = await putRes.json();
+                    alert("同步失败: " + err.message);
                 }
             } catch(e) {
                 alert("发生错误: " + e.message);
             }
-            btn.innerText = '💾 保存修改并推送';
+            btn.innerText = '💾 保存并更新云端';
         }
     </scr` + `ipt>
 </body>
