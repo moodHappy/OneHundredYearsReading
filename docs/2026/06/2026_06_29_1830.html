@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>In spite of the fact that...</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: #6c5ce7; --highlight: #fef9e7; }
+        body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; padding-bottom: 50px;}
+        .nav-back { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
+        .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .sync-status { font-size: 0.85rem; color: #27ae60; font-weight: bold; display: none; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; font-weight: bold;}
+        .markdown-body { font-size: 1.05rem; line-height: 1.6; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
+
+        /* 原文段落排版 p 标签增强 */
+        #view-original p { margin-bottom: 16px; color: #34495e; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; }
+        #view-original p:last-child { margin-bottom: 0; }
+
+        .markdown-body p { margin-top: 0; margin-bottom: 12px; }
+        .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 8px; padding-left: 20px; }
+        .markdown-body li { margin-bottom: 4px; }
+        .markdown-body blockquote { margin: 0 0 10px 0; padding: 10px 15px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.1rem; border-radius: 0 8px 8px 0; }
+        .markdown-body hr { border: 0; border-top: 1px dashed #bdc3c7; margin: 15px 0; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.95rem; }
+        .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+        .markdown-body th { background: #f8f9fa; color: var(--accent); }
+        .edit-textarea { width: 100%; min-height: 150px; padding: 15px; font-family: monospace; font-size: 1.05rem; border: 2px solid var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; display: none; background: #fff; color: #2c3e50; line-height: 1.5; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="../../index.html">🔙 返回矩阵枢纽</a>
+            <span class="sync-status" id="sync-status">📡 同步中...</span>
+        </div>
+        <textarea id="raw-original" style="display:none;">In spite of the fact that a trip to the capital was little less than impossible at that time, José Arcadio Buendía promised to undertake it as soon as the government ordered him to so that he could put on some practical demonstrations of his invention for the military authorities and could train them himself in the complicated art of solar war.
+
+For several years he waited for an answer.</textarea>
+        <textarea id="raw-analysis" style="display:none;"># 📌 完整翻译
+
+尽管当时前往首都几乎是不可能完成的旅程，何塞·阿尔卡蒂奥·布恩迪亚仍然答应，只要政府一声令下，他就会立刻启程，好亲自向军方展示自己发明的实际效果，并亲自训练他们掌握这门复杂的“太阳战争”艺术。
+
+他就这样等待政府的答复，一等就是好几年。
+
+---
+
+# 📘 英语教学式讲解
+
+## 1. In spite of the fact that
+- 尽管……
+- in spite of the fact that：尽管……（正式表达）
+- 相当于：
+  - although
+  - even though
+
+---
+
+## 2. a trip to the capital was little less than impossible
+- 前往首都几乎是不可能的。
+- a trip to the capital：去首都的旅程。
+- little less than impossible：几乎是不可能的。
+- **little less than...** 是文学表达，意思接近 **almost**、**virtually**。
+
+---
+
+## 3. at that time
+- 在那个时候。
+- 作时间状语，交代故事背景。
+
+---
+
+## 4. José Arcadio Buendía promised to undertake it
+- 何塞·阿尔卡蒂奥·布恩迪亚答应亲自前往。
+- promised to：答应去做……
+- undertake：承担、着手进行；这里表示“启程去完成这项任务”。
+
+---
+
+## 5. as soon as the government ordered him to
+- 只要政府命令他。
+- as soon as：一……就……
+- ordered him to：命令他去……
+- to 后面的 **go** 被省略了，属于英语常见的省略结构。
+
+---
+
+## 6. so that he could put on some practical demonstrations
+- 以便他能够进行实际演示。
+- so that：为了、以便。
+- could：能够（表示目的）。
+- put on：举行、展示。
+- practical demonstrations：实际演示。
+
+---
+
+## 7. of his invention
+- 关于他的发明。
+- invention：发明。
+
+---
+
+## 8. for the military authorities
+- 向军方官员展示。
+- military：军事的。
+- authorities：当局、官方人员。
+- military authorities：军方、军事部门。
+
+---
+
+## 9. and could train them himself
+- 并亲自训练他们。
+- train：训练、培训。
+- himself：亲自（强调是他本人）。
+
+---
+
+## 10. in the complicated art of solar war
+- 学习这门复杂的“太阳战争”艺术。
+- complicated：复杂的。
+- art：技艺、学问（这里不是“艺术作品”）。
+- solar war：太阳战争。
+- 指利用放大镜聚焦阳光作为武器的幻想性战术。
+
+---
+
+## 11. For several years he waited for an answer
+- 他等待答复，一等就是好几年。
+- for several years：持续好几年。
+- waited for：等待。
+- an answer：答复、回音。
+
+---
+
+# 📌 Language Note
+
+最后一句 **For several years he waited for an answer.** 非常简短，却具有强烈的文学效果。
+
+前一句描写主人公充满雄心壮志，准备亲自向政府展示自己的发明；紧接着作者只用一句：
+
+&gt; **For several years he waited for an answer.**
+
+便将他的满腔期待与漫长而毫无结果的等待形成鲜明反差，带有一种黑色幽默，也为《百年孤独》后续反复出现的**理想落空**主题埋下伏笔。
+
+---
+
+# 📌 Key Expressions
+
+- in spite of the fact that —— 尽管……
+- little less than impossible —— 几乎不可能
+- undertake —— 承担；着手；启程执行
+- as soon as —— 一……就……
+- order somebody to do something —— 命令某人做某事
+- put on a demonstration —— 进行演示
+- practical demonstration —— 实际演示
+- military authorities —— 军方
+- train somebody —— 训练某人
+- the art of... —— ……的技艺
+- wait for an answer —— 等待答复</textarea>
+        <textarea id="raw-page-title" style="display:none;">Chapter 1</textarea>
+        <textarea id="raw-page-url" style="display:none;">https://moodhappy.github.io/MiyetsukoSeries/Books/Hundred/Chapter_001_1782296877406.html</textarea>
+
+        <div class="card" id="block-original">
+            <div class="card-header">📖 原始文本 (Original)</div>
+            <div class="source-info" style="margin-bottom: 12px; font-size: 0.9rem;">
+                <a href="https://moodhappy.github.io/MiyetsukoSeries/Books/Hundred/Chapter_001_1782296877406.html" target="_blank" style="color: #6c5ce7; text-decoration: none; font-weight: bold;">🔗 Chapter 1</a>
+            </div>
+            <div id="view-original" class="markdown-body"></div>
+            <textarea id="edit-original" class="edit-textarea"></textarea>
+        </div>
+
+        <div class="card" id="block-analysis">
+            <div class="card-header">🔬 深度解构 (Analysis)</div>
+            <div id="view-analysis" class="markdown-body"></div>
+            <textarea id="edit-analysis" class="edit-textarea"></textarea>
+        </div>
+    </div>
+
+    <script>
+        const GH_OWNER = "moodHappy";
+        const GH_REPO = "OneHundredYearsReading";
+        const ACCENT = "#6c5ce7";
+        function escapeHTML(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+        const buildHTML = function(title, safeOrig, safeAnal, safePageTitle, safePageUrl, GH_OWNER, GH_REPO, accent, escapeFnStr, builderFnStr) {
+        return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>${title}</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></scr`+`ipt>
+    <style>
+        :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: ${accent}; --highlight: #fef9e7; }
+        body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; padding-bottom: 50px;}
+        .nav-back { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
+        .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .sync-status { font-size: 0.85rem; color: #27ae60; font-weight: bold; display: none; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; font-weight: bold;}
+        .markdown-body { font-size: 1.05rem; line-height: 1.6; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
+
+        /* 原文段落排版 p 标签增强 */
+        #view-original p { margin-bottom: 16px; color: #34495e; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; }
+        #view-original p:last-child { margin-bottom: 0; }
+
+        .markdown-body p { margin-top: 0; margin-bottom: 12px; }
+        .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 8px; padding-left: 20px; }
+        .markdown-body li { margin-bottom: 4px; }
+        .markdown-body blockquote { margin: 0 0 10px 0; padding: 10px 15px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.1rem; border-radius: 0 8px 8px 0; }
+        .markdown-body hr { border: 0; border-top: 1px dashed #bdc3c7; margin: 15px 0; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.95rem; }
+        .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+        .markdown-body th { background: #f8f9fa; color: var(--accent); }
+        .edit-textarea { width: 100%; min-height: 150px; padding: 15px; font-family: monospace; font-size: 1.05rem; border: 2px solid var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; display: none; background: #fff; color: #2c3e50; line-height: 1.5; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="../../index.html">🔙 返回矩阵枢纽</a>
+            <span class="sync-status" id="sync-status">📡 同步中...</span>
+        </div>
+        <textarea id="raw-original" style="display:none;">${safeOrig}</textarea>
+        <textarea id="raw-analysis" style="display:none;">${safeAnal}</textarea>
+        <textarea id="raw-page-title" style="display:none;">${safePageTitle}</textarea>
+        <textarea id="raw-page-url" style="display:none;">${safePageUrl}</textarea>
+
+        <div class="card" id="block-original">
+            <div class="card-header">📖 原始文本 (Original)</div>
+            <div class="source-info" style="margin-bottom: 12px; font-size: 0.9rem;">
+                <a href="${safePageUrl}" target="_blank" style="color: ${accent}; text-decoration: none; font-weight: bold;">🔗 ${safePageTitle}</a>
+            </div>
+            <div id="view-original" class="markdown-body"></div>
+            <textarea id="edit-original" class="edit-textarea"></textarea>
+        </div>
+
+        <div class="card" id="block-analysis">
+            <div class="card-header">🔬 深度解构 (Analysis)</div>
+            <div id="view-analysis" class="markdown-body"></div>
+            <textarea id="edit-analysis" class="edit-textarea"></textarea>
+        </div>
+    </div>
+
+    <script>
+        const GH_OWNER = "${GH_OWNER}";
+        const GH_REPO = "${GH_REPO}";
+        const ACCENT = "${accent}";
+        ${escapeFnStr}
+        const buildHTML = ${builderFnStr};
+
+        const renderAll = function() {
+            // 原文基于换行符转为 <p> 标签渲染
+            const rawOrig = document.getElementById('raw-original').value;
+            const paragraphs = rawOrig.split(/\\n+/).filter(p => p.trim() !== '');
+            document.getElementById('view-original').innerHTML = paragraphs.map(p => '<p>' + escapeHTML(p) + '</p>').join('');
+
+            // 教师级解构直接走 Markdown 渲染
+            const analContent = document.getElementById('raw-analysis').value;
+            try {
+                if (typeof marked !== 'undefined') {
+                    document.getElementById('view-analysis').innerHTML = marked.parse(analContent);
+                }
+            } catch(e) {
+                console.error("Markdown failed", e);
+            }
+        };
+
+        const triggerEditOrig = function() {
+            const viewBlock = document.getElementById('view-original');
+            const editBlock = document.getElementById('edit-original');
+            viewBlock.style.display = 'none';
+            editBlock.style.display = 'block';
+            editBlock.value = document.getElementById('raw-original').value;
+            editBlock.focus();
+        };
+
+        const triggerEditAnal = function() {
+            const viewBlock = document.getElementById('view-analysis');
+            const editBlock = document.getElementById('edit-analysis');
+            viewBlock.style.display = 'none';
+            editBlock.style.display = 'block';
+            editBlock.value = document.getElementById('raw-analysis').value;
+            editBlock.focus();
+        };
+
+        window.onload = renderAll;
+
+        // 统一静默同步函数
+        const saveToGitHub = async function() {
+            const token = localStorage.getItem('GH_TOKEN');
+            if(!token) return alert("⚠️ 缺少 GH_TOKEN。请确保在主枢纽页面配置过！");
+
+            const statusMsg = document.getElementById('sync-status');
+            statusMsg.style.display = 'block';
+            statusMsg.style.color = ACCENT;
+            statusMsg.innerText = '📡 静默同步中...';
+
+            const orig = document.getElementById('raw-original').value;
+            const anal = document.getElementById('raw-analysis').value;
+            const pTitle = document.getElementById('raw-page-title').value;
+            const pUrl = document.getElementById('raw-page-url').value;
+
+            const pureHtml = buildHTML(
+                document.title,
+                escapeHTML(orig),
+                escapeHTML(anal),
+                escapeHTML(pTitle),
+                escapeHTML(pUrl),
+                GH_OWNER,
+                GH_REPO,
+                ACCENT,
+                escapeHTML.toString(),
+                buildHTML.toString()
+            );
+
+            const path = window.location.pathname;
+            const fileRelPath = path.substring(path.indexOf('docs/'));
+            try {
+                const utf8Array = Array.from(new TextEncoder().encode(pureHtml));
+                const binaryString = utf8Array.map(b => String.fromCharCode(b)).join('');
+                const base64Html = btoa(binaryString);
+
+                const getRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
+                    headers: { 'Authorization': \`token \${token}\` }
+                });
+                const fileData = await getRes.json();
+
+                const putRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': \`token \${token}\`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: \`Auto-save update (Text/Analysis)\`,
+                        content: base64Html,
+                        sha: fileData.sha
+                    })
+                });
+
+                if(putRes.ok) {
+                    statusMsg.style.color = '#27ae60';
+                    statusMsg.innerText = '✅ 云端已同步';
+                    setTimeout(() => statusMsg.style.display = 'none', 3000);
+                } else {
+                    statusMsg.style.color = '#e74c3c';
+                    statusMsg.innerText = '❌ 同步失败';
+                }
+            } catch(e) {
+                statusMsg.style.color = '#e74c3c';
+                statusMsg.innerText = '❌ 网络断开';
+            }
+        };
+
+        // 绑定原文块事件
+        const viewOrig = document.getElementById('view-original');
+        const editOrig = document.getElementById('edit-original');
+        viewOrig.addEventListener('dblclick', triggerEditOrig);
+        viewOrig.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEditOrig(); });
+        editOrig.addEventListener('blur', async function() {
+            const newText = this.value.trim();
+            const oldText = document.getElementById('raw-original').value.trim();
+            this.style.display = 'none';
+            viewOrig.style.display = 'block';
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-original').value = newText;
+                renderAll();
+                await saveToGitHub();
+            }
+        });
+
+        // 绑定解析块事件
+        const viewAnal = document.getElementById('view-analysis');
+        const editAnal = document.getElementById('edit-analysis');
+        viewAnal.addEventListener('dblclick', triggerEditAnal);
+        viewAnal.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEditAnal(); });
+        editAnal.addEventListener('blur', async function() {
+            const newText = this.value.trim();
+            const oldText = document.getElementById('raw-analysis').value.trim();
+            this.style.display = 'none';
+            viewAnal.style.display = 'block';
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-analysis').value = newText;
+                renderAll();
+                await saveToGitHub();
+            }
+        });
+    </scr`+`ipt>
+</body>
+</html>`;
+    };
+
+        const renderAll = function() {
+            // 原文基于换行符转为 <p> 标签渲染
+            const rawOrig = document.getElementById('raw-original').value;
+            const paragraphs = rawOrig.split(/\n+/).filter(p => p.trim() !== '');
+            document.getElementById('view-original').innerHTML = paragraphs.map(p => '<p>' + escapeHTML(p) + '</p>').join('');
+
+            // 教师级解构直接走 Markdown 渲染
+            const analContent = document.getElementById('raw-analysis').value;
+            try {
+                if (typeof marked !== 'undefined') {
+                    document.getElementById('view-analysis').innerHTML = marked.parse(analContent);
+                }
+            } catch(e) {
+                console.error("Markdown failed", e);
+            }
+        };
+
+        const triggerEditOrig = function() {
+            const viewBlock = document.getElementById('view-original');
+            const editBlock = document.getElementById('edit-original');
+            viewBlock.style.display = 'none';
+            editBlock.style.display = 'block';
+            editBlock.value = document.getElementById('raw-original').value;
+            editBlock.focus();
+        };
+
+        const triggerEditAnal = function() {
+            const viewBlock = document.getElementById('view-analysis');
+            const editBlock = document.getElementById('edit-analysis');
+            viewBlock.style.display = 'none';
+            editBlock.style.display = 'block';
+            editBlock.value = document.getElementById('raw-analysis').value;
+            editBlock.focus();
+        };
+
+        window.onload = renderAll;
+
+        // 统一静默同步函数
+        const saveToGitHub = async function() {
+            const token = localStorage.getItem('GH_TOKEN');
+            if(!token) return alert("⚠️ 缺少 GH_TOKEN。请确保在主枢纽页面配置过！");
+
+            const statusMsg = document.getElementById('sync-status');
+            statusMsg.style.display = 'block';
+            statusMsg.style.color = ACCENT;
+            statusMsg.innerText = '📡 静默同步中...';
+
+            const orig = document.getElementById('raw-original').value;
+            const anal = document.getElementById('raw-analysis').value;
+            const pTitle = document.getElementById('raw-page-title').value;
+            const pUrl = document.getElementById('raw-page-url').value;
+
+            const pureHtml = buildHTML(
+                document.title,
+                escapeHTML(orig),
+                escapeHTML(anal),
+                escapeHTML(pTitle),
+                escapeHTML(pUrl),
+                GH_OWNER,
+                GH_REPO,
+                ACCENT,
+                escapeHTML.toString(),
+                buildHTML.toString()
+            );
+
+            const path = window.location.pathname;
+            const fileRelPath = path.substring(path.indexOf('docs/'));
+            try {
+                const utf8Array = Array.from(new TextEncoder().encode(pureHtml));
+                const binaryString = utf8Array.map(b => String.fromCharCode(b)).join('');
+                const base64Html = btoa(binaryString);
+
+                const getRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                const fileData = await getRes.json();
+
+                const putRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Auto-save update (Text/Analysis)`,
+                        content: base64Html,
+                        sha: fileData.sha
+                    })
+                });
+
+                if(putRes.ok) {
+                    statusMsg.style.color = '#27ae60';
+                    statusMsg.innerText = '✅ 云端已同步';
+                    setTimeout(() => statusMsg.style.display = 'none', 3000);
+                } else {
+                    statusMsg.style.color = '#e74c3c';
+                    statusMsg.innerText = '❌ 同步失败';
+                }
+            } catch(e) {
+                statusMsg.style.color = '#e74c3c';
+                statusMsg.innerText = '❌ 网络断开';
+            }
+        };
+
+        // 绑定原文块事件
+        const viewOrig = document.getElementById('view-original');
+        const editOrig = document.getElementById('edit-original');
+        viewOrig.addEventListener('dblclick', triggerEditOrig);
+        viewOrig.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEditOrig(); });
+        editOrig.addEventListener('blur', async function() {
+            const newText = this.value.trim();
+            const oldText = document.getElementById('raw-original').value.trim();
+            this.style.display = 'none';
+            viewOrig.style.display = 'block';
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-original').value = newText;
+                renderAll();
+                await saveToGitHub();
+            }
+        });
+
+        // 绑定解析块事件
+        const viewAnal = document.getElementById('view-analysis');
+        const editAnal = document.getElementById('edit-analysis');
+        viewAnal.addEventListener('dblclick', triggerEditAnal);
+        viewAnal.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEditAnal(); });
+        editAnal.addEventListener('blur', async function() {
+            const newText = this.value.trim();
+            const oldText = document.getElementById('raw-analysis').value.trim();
+            this.style.display = 'none';
+            viewAnal.style.display = 'block';
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-analysis').value = newText;
+                renderAll();
+                await saveToGitHub();
+            }
+        });
+    </script>
+</body>
+</html>
