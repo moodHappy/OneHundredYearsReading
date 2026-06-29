@@ -6,7 +6,7 @@ BASE_DIR = "docs"
 def generate_index():
     os.makedirs(BASE_DIR, exist_ok=True)
 
-    print("⚙️ 正在重新编译全栈语法枢纽...")
+    print("⚙️ 正在重新编译全栈语法枢纽 (集成了全库文本检索功能)...")
     archive_data = {}
 
     # 扫描年份文件夹
@@ -32,16 +32,36 @@ def generate_index():
                         file_path = f"{year}/{month}/{file}"
 
                         title = "📌 语法解构"
+                        original_text = "" # 用于存放提取出的原始英文文本
+                        
+                        # 通读文件，精准解构 Title 与原始文本内容
                         with open(os.path.join(BASE_DIR, year, month, file), 'r', encoding='utf-8') as f_html:
-                            content = f_html.read(2000)
+                            content = f_html.read()
+                            
+                            # 提取标题
                             start = content.find('<title>')
                             end = content.find('</title>')
                             if start != -1 and end != -1:
                                 title = content[start+7:end]
+                            
+                            # 提取指定的 raw-original 内容
+                            orig_start_tag = '<textarea id="raw-original" style="display:none;">'
+                            start_orig = content.find(orig_start_tag)
+                            if start_orig != -1:
+                                end_orig = content.find('</textarea>', start_orig)
+                                if end_orig != -1:
+                                    original_text = content[start_orig + len(orig_start_tag):end_orig]
 
                         if d_int not in archive_data[y_int][m_int]:
                             archive_data[y_int][m_int][d_int] = []
-                        archive_data[y_int][m_int][d_int].append({"time": time_str, "path": file_path, "title": title})
+                            
+                        # 将原文沉淀进 JSON 数据库中
+                        archive_data[y_int][m_int][d_int].append({
+                            "time": time_str, 
+                            "path": file_path, 
+                            "title": title,
+                            "original": original_text.strip()
+                        })
                 except Exception as e:
                     print(f"解析文件出错 {file}: {e}")
 
@@ -62,33 +82,34 @@ def generate_index():
         .page { flex: 0 0 100vw; width: 100vw; height: 100vh; scroll-snap-align: start; overflow-y: auto; padding-bottom: 30px; box-sizing: border-box; }
         
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { text-align: center; padding: 20px 0; border-bottom: 1px dashed var(--border); margin-bottom: 20px; position: relative; }
-        .header h1 { margin: 0 0 5px 0; font-size: 2rem; color: var(--primary); font-weight: 800; }
-        .header h1 span { color: #f39c12; }
-        .header p { margin: 0; font-size: 0.9rem; color: #7f8c8d; letter-spacing: 1px; }
-        .settings-btn { position: absolute; right: 0; top: 20px; background: none; border: none; font-size: 1.4rem; cursor: pointer; opacity: 0.8; }
+        
+        /* 完美还原截图的顶部顶格搜索栏 */
+        .search-bar-wrapper { display: flex; align-items: center; gap: 12px; margin-top: 5px; margin-bottom: 20px; }
+        .search-input { flex-grow: 1; padding: 12px 18px; border: 1px solid var(--border); border-radius: 25px; outline: none; font-size: 0.95rem; background: var(--card); box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); transition: border-color 0.2s; }
+        .search-input:focus { border-color: var(--primary); }
+        .settings-btn-top { background: none; border: none; font-size: 1.4rem; cursor: pointer; opacity: 0.8; padding: 0; display: flex; align-items: center; }
         
         .controls { display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 20px; }
-        .select-box { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-weight: bold; background: var(--card); color: var(--primary); }
-        .nav-btn, .today-btn { background: var(--primary); color: white; border: none; border-radius: 8px; padding: 8px 12px; font-weight: bold; font-size: 0.95rem; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s, background 0.2s;}
-        .nav-btn:active, .today-btn:active { transform: scale(0.95); background: #2471a3; }
-        .today-btn { padding: 8px 16px; }
+        .select-box { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; outline: none; font-weight: bold; background: var(--card); color: var(--primary); -webkit-appearance: none; appearance: none; text-align: center; }
+        .nav-btn, .today-btn { background: #e74c3c; color: white; border: none; border-radius: 8px; padding: 8px 14px; font-weight: bold; font-size: 0.95rem; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s, background 0.2s;}
+        .nav-btn:active, .today-btn:active { transform: scale(0.95); background: #c0392b; }
+        .today-btn { padding: 8px 18px; }
 
-        .calendar-wrapper { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .calendar-wrapper { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.01); margin-bottom: 20px; }
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 13px; color: #888; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
         .day-cell { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-weight: bold; border-radius: 10px; position: relative; cursor: pointer; transition: all 0.2s; }
         .day-cell.empty { visibility: hidden; }
         .day-cell.has-news { color: var(--text); background: #fdfdfd; border: 1px solid #f5f5f5; }
         .day-cell.no-news { color: #dcdde1; }
-        .day-cell.selected { background: #eaf2f8; color: var(--primary); border: 1px solid #3498db; }
+        .day-cell.selected { border: 1px solid #e74c3c; background: #fdedec; color: #e74c3c; }
         .day-cell.today { background: #fff9e6; border: 1px solid #f1c40f; }
-        .dot { width: 5px; height: 5px; background: var(--primary); border-radius: 50%; position: absolute; bottom: 5px; display: none; }
+        .dot { width: 4px; height: 4px; background: #e74c3c; border-radius: 50%; position: absolute; bottom: 6px; display: none; }
         .day-cell.has-news .dot { display: block; }
         
         /* 极致紧凑一行流行表 */
         .feed-list { display: flex; flex-direction: column; gap: 12px; }
-        .feed-item { background: var(--card); padding: 16px 18px; border-radius: 12px; text-decoration: none; color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.03); display: flex; flex-direction: row; align-items: center; gap: 15px; transition: transform 0.2s; border: 1px solid transparent; }
+        .feed-item { background: var(--card); padding: 16px 18px; border-radius: 12px; text-decoration: none; color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: row; align-items: center; gap: 15px; transition: transform 0.2s; border: 1px solid transparent; }
         .feed-item:active { transform: scale(0.98); background: #fafafa; }
         .feed-time { font-family: -apple-system, sans-serif; font-weight: 800; color: #111; font-size: 0.95rem; flex-shrink: 0; min-width: 45px; text-align: center; }
         .feed-title { color: #7f8c8d; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; }
@@ -114,12 +135,12 @@ def generate_index():
     <div class="viewport" id="viewport">
         <div class="page" id="page-1">
             <div class="container">
-                <div class="header">
-                    <h1><span>Macondo</span> Matrix</h1>
-                    <p>百年孤独精读</p>
-                    <button class="settings-btn" onclick="document.getElementById('modal').style.display='flex'">⚙️</button>
+                <div class="search-bar-wrapper">
+                    <input type="text" id="searchInput" class="search-input" placeholder="搜索全库 HTML 英文原文或标题...">
+                    <button class="settings-btn-top" onclick="document.getElementById('modal').style.display='flex'">⚙️</button>
                 </div>
-                <div class="controls">
+                
+                <div class="controls" id="calendarControls">
                     <button class="nav-btn" id="prevMonthBtn">&lt;</button>
                     <select class="select-box" id="yearSelect"></select>
                     <select class="select-box" id="monthSelect">
@@ -129,22 +150,24 @@ def generate_index():
                         <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
                     </select>
                     <button class="nav-btn" id="nextMonthBtn">&gt;</button>
-                    <button class="today-btn" id="todayBtn">今日</button>
+                    <button class="today-btn" id="todayBtn">今天</button>
                 </div>
-                <div class="calendar-wrapper">
+                
+                <div class="calendar-wrapper" id="calendarWrapper">
                     <div class="weekdays"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
                     <div class="days-grid" id="daysGrid"></div>
                 </div>
+                
                 <div class="feed-list" id="feedList"></div>
-                <div class="page-indicator">← 向左滑动进入录入矩阵</div>
+                <div class="page-indicator" id="slideIndicator">← 向左滑动进入录入矩阵</div>
             </div>
         </div>
         
         <div class="page" id="page-2">
             <div class="container">
-                <div class="header">
-                    <h1>Deconstruct</h1>
-                    <p>目标仓库: OneHundredYearsReading</p>
+                <div class="header" style="text-align: center; padding: 10px 0 20px 0;">
+                    <h1 style="margin: 0; font-size: 1.8rem; color: var(--primary);">Deconstruct</h1>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: #7f8c8d;">目标仓库: OneHundredYearsReading</p>
                 </div>
                 <div class="form-group">
                     <label>原文 (Original Text)</label>
@@ -186,6 +209,7 @@ def generate_index():
         const yearSelect = document.getElementById('yearSelect');
         const monthSelect = document.getElementById('monthSelect');
         const daysGrid = document.getElementById('daysGrid');
+        const searchInput = document.getElementById('searchInput');
         
         function initSelects() {
             const years = Object.keys(archiveData).map(Number).sort((a,b)=>b-a);
@@ -237,6 +261,63 @@ def generate_index():
                 list.innerHTML = '<div style="text-align:center; padding: 25px 20px; color:#bdc3c7; font-size: 0.9rem;">当日无其他解构档案</div>';
             }
         }
+
+        // ==========================================
+        // 核心亮点：全静态库无缝搜索功能逻辑
+        // ==========================================
+        searchInput.oninput = function(e) {
+            const query = e.target.value.trim().toLowerCase();
+            const calWrapper = document.getElementById('calendarWrapper');
+            const calControls = document.getElementById('calendarControls');
+            const slideIndicator = document.getElementById('slideIndicator');
+            const list = document.getElementById('feedList');
+            
+            if (query) {
+                // 搜索激活状态：深度隐藏日历盘区和辅助滑动提示
+                calWrapper.style.display = 'none';
+                calControls.style.display = 'none';
+                if(slideIndicator) slideIndicator.style.display = 'none';
+                
+                let resultsHtml = '';
+                let matchCount = 0;
+                
+                // 全库横向全扫 JSON 树
+                for (const y in archiveData) {
+                    for (const m in archiveData[y]) {
+                        for (const d in archiveData[y][m]) {
+                            const items = archiveData[y][m][d];
+                            items.forEach(item => {
+                                const inOriginal = item.original && item.original.toLowerCase().includes(query);
+                                const inTitle = item.title && item.title.toLowerCase().includes(query);
+                                
+                                if (inOriginal || inTitle) {
+                                    matchCount++;
+                                    const datePrefix = `${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
+                                    resultsHtml += `
+                                        <a href="${item.path}" class="feed-item">
+                                            <span class="feed-time" style="min-width: 55px; font-size: 0.85rem; color: #e74c3c; background: #fdedec; border-radius: 6px; padding: 2px 4px;">${datePrefix}</span>
+                                            <span class="feed-title">${item.title}</span>
+                                        </a>`;
+                                }
+                            });
+                        }
+                    }
+                }
+                
+                if (matchCount > 0) {
+                    list.innerHTML = resultsHtml;
+                } else {
+                    list.innerHTML = '<div style="text-align:center; padding: 35px 20px; color:#bdc3c7; font-size: 0.9rem;">🔍 未检索到匹配的解构档案</div>';
+                }
+            } else {
+                // 搜索词清空：无缝还原日历主面板
+                calWrapper.style.display = 'block';
+                calControls.style.display = 'flex';
+                if(slideIndicator) slideIndicator.style.display = 'block';
+                renderCalendar();
+                renderList();
+            }
+        };
         
         yearSelect.onchange = e => { sY = parseInt(e.target.value); renderCalendar(); renderList(); };
         monthSelect.onchange = e => { sM = parseInt(e.target.value); renderCalendar(); renderList(); };
@@ -245,7 +326,6 @@ def generate_index():
         renderCalendar(); 
         renderList();
 
-        // 绑定按钮事件控制
         function ensureYearOption(y) {
             let found = false;
             for(let i=0; i<yearSelect.options.length; i++){
@@ -358,9 +438,6 @@ def generate_index():
             btn.innerText = "🚀 推送至云端矩阵"; btn.disabled = false;
         }
 
-        // ==========================================
-        // 生成极度紧凑排版的子页面 HTML
-        // ==========================================
         function generateTemplate(title, orig, anal) {
             const safeOrig = escapeHTML(orig);
             const safeAnal = escapeHTML(anal);
@@ -373,7 +450,7 @@ def generate_index():
     <title>${title}</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></scr` + `ipt>
     <style>
-        :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: #2980b9; --highlight: #fef9e7; }
+        :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: #6c5ce7; --highlight: #fef9e7; }
         body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
         .container { max-width: 700px; margin: 0 auto; padding-bottom: 50px;}
         .nav-back { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
@@ -383,30 +460,20 @@ def generate_index():
         .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; font-weight: bold;}
         
-        /* 极致紧凑的 Markdown 渲染样式 */
         .markdown-body { font-size: 1.05rem; line-height: 1.6; }
         .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
-        .markdown-body h3 { font-size: 1.15rem; }
-        .markdown-body p { margin-top: 0; margin-bottom: 8px; }
+        #view-original p { margin-bottom: 16px; color: #34495e; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; }
+        #view-original p:last-child { margin-bottom: 0; }
         
-        /* 消除松散列表造成的巨大空隙 */
+        .markdown-body p { margin-top: 0; margin-bottom: 12px; }
         .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 8px; padding-left: 20px; }
         .markdown-body li { margin-bottom: 4px; }
-        .markdown-body li p { margin: 0; } 
-        
-        /* 自动隐藏因多敲回车产生的纯空白行 */
-        .markdown-body p:empty { display: none; } 
-        .markdown-body br + br { display: none; } 
-        
         .markdown-body blockquote { margin: 0 0 10px 0; padding: 10px 15px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.1rem; border-radius: 0 8px 8px 0; }
-        .markdown-body blockquote p { margin-bottom: 0; }
         .markdown-body hr { border: 0; border-top: 1px dashed #bdc3c7; margin: 15px 0; }
         .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.95rem; }
         .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px; text-align: left; }
         .markdown-body th { background: #f8f9fa; color: var(--accent); }
-        
-        /* 无痕静默编辑区 */
-        .edit-textarea { width: 100%; min-height: 250px; padding: 15px; font-family: monospace; font-size: 1.05rem; border: 2px solid var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; display: none; background: #fff; color: #2c3e50; line-height: 1.5; outline: none; box-shadow: 0 4px 15px rgba(41,128,185,0.1);}
+        .edit-textarea { width: 100%; min-height: 150px; padding: 15px; font-family: monospace; font-size: 1.05rem; border: 2px solid var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; display: none; background: #fff; color: #2c3e50; line-height: 1.5; outline: none; box-shadow: 0 4px 15px rgba(41,128,185,0.1);}
     </style>
 </head>
 <body>
