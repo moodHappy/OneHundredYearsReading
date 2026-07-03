@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Active, small, severe, th...</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: #6c5ce7; --highlight: #fef9e7; }
+        body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; padding-bottom: 50px;}
+        .nav-back { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
+        .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .sync-status { font-size: 0.85rem; color: #27ae60; font-weight: bold; display: none; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; font-weight: bold;}
+        .markdown-body { font-size: 1.05rem; line-height: 1.6; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
+
+        /* 原文段落排版 p 标签增强 */
+        #view-original p { margin-bottom: 16px; color: #34495e; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; }
+        #view-original p:last-child { margin-bottom: 0; }
+
+        .markdown-body p { margin-top: 0; margin-bottom: 12px; }
+        .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 8px; padding-left: 20px; }
+        .markdown-body li { margin-bottom: 4px; }
+        .markdown-body blockquote { margin: 0 0 10px 0; padding: 10px 15px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.1rem; border-radius: 0 8px 8px 0; }
+        .markdown-body hr { border: 0; border-top: 1px dashed #bdc3c7; margin: 15px 0; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.95rem; }
+        .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+        .markdown-body th { background: #f8f9fa; color: var(--accent); }
+        .edit-textarea { width: 100%; min-height: 150px; padding: 15px; font-family: monospace; font-size: 1.05rem; border: 2px solid var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; display: none; background: #fff; color: #2c3e50; line-height: 1.5; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="../../index.html">🔙 返回矩阵枢纽</a>
+            <span class="sync-status" id="sync-status">📡 同步中...</span>
+        </div>
+        <textarea id="raw-original" style="display:none;">Active, small, severe, that woman of unbreakable nerves who at no moment in her life had been heard to sing seemed to be everywhere, from dawn until quite late at night, always pursued by the soft whispering stiff, starched petticoats.</textarea>
+        <textarea id="raw-analysis" style="display:none;"># 📌 完整翻译
+
+那位女性精力充沛、身材娇小、神情严厉，拥有坚不可摧的神经，从未有人在她一生中听过她唱歌。她似乎无处不在，从清晨一直忙碌到深夜，始终被那种沙沙作响、浆得僵硬的衬裙轻柔的窸窣声所追随。
+
+---
+
+# 📘 英语教学式讲解
+
+## 1. Active, small, severe
+- 精力充沛、身材娇小、神情严厉。
+- 三个并列形容词，构成**人物速写式刻画**：
+  - active：活跃的、精力旺盛的
+  - small：身材娇小的
+  - severe：严厉的、神情严肃的
+
+👉 英语中这种“无动词形容词堆叠”常用于文学人物描写。
+
+---
+
+## 2. that woman of unbreakable nerves
+- 那位拥有坚不可摧神经的女人。
+- of unbreakable nerves：名词结构，表示“具有……特质的”。
+
+👉 “of + 抽象名词”是书面语中强化特质的结构：
+- a man of courage（勇敢的人）
+- a woman of strength（坚强的女人）
+
+---
+
+## 3. who at no moment in her life had been heard to sing
+- 她一生中从未被人听见唱歌。
+- at no moment：从未（强否定结构）。
+- had been heard to sing：被听见唱歌（被动语态 + 完成时）。
+
+👉 “at no moment” 比 “never” 更强调绝对否定语气。
+
+---
+
+## 4. seemed to be everywhere
+- 似乎无处不在。
+- seemed to be：似乎是……
+- everywhere：到处、无处不在。
+
+👉 表达人物“存在感极强”。
+
+---
+
+## 5. from dawn until quite late at night
+- 从清晨一直到很晚的夜里。
+- dawn：黎明。
+- quite late at night：深夜。
+
+👉 时间跨度强调“持续劳动”。
+
+---
+
+## 6. always pursued by the soft whispering
+- 总是被轻柔的窸窣声所追随。
+- pursued by：被……追逐。
+- whispering：轻声、窸窣声。
+
+👉 “pursued” 本义是“追逐”，在这里形成拟人化效果。
+
+---
+
+## 7. stiff, starched petticoats
+- 僵硬、浆过的衬裙。
+- stiff：僵硬的。
+- starched：上浆的（经过淀粉处理使衣物挺括）。
+- petticoats：衬裙（女性内裙）。
+
+👉 这里是非常典型的马尔克斯式细节：
+- 用衣物的声音/质感来塑造人物存在感
+
+---
+
+# 📌 Language Note
+
+这一段不是在“讲事情”，而是在做**人物密度描写（character density portrait）**：
+
+### 1. 外在层
+- active / small / severe
+
+### 2. 性格层
+- unbreakable nerves（情绪稳定、极度坚韧）
+- never heard to sing（无情绪外露）
+
+### 3. 运动层
+- everywhere（空间扩散）
+
+### 4. 声音层（关键意象）
+- soft whispering petticoats
+
+👉 最重要的修辞是：
+
+&gt; 人物不再通过“行为”存在，而是通过“声音与物体的摩擦感”存在。
+
+这种写法是马尔克斯常见的“具象化存在感”。
+
+---
+
+# 📌 Key Expressions
+
+- active / small / severe —— 活跃 / 娇小 / 严厉
+- a woman of unbreakable nerves —— 神经坚韧的女人
+- at no moment —— 从未（强否定）
+- be heard to do sth —— 被听见做某事
+- seem to be everywhere —— 似乎无处不在
+- from dawn until night —— 从早到晚
+- be pursued by —— 被……追随
+- whispering —— 轻声 / 窸窣声
+- stiff, starched —— 僵硬且上浆的
+- petticoats —— 衬裙
+```</textarea>
+        <textarea id="raw-page-title" style="display:none;">Chapter 1</textarea>
+        <textarea id="raw-page-url" style="display:none;">https://moodhappy.github.io/MiyetsukoSeries/Books/Hundred/Chapter_001_1782296877406.html</textarea>
+
+        <div class="card" id="block-original">
+            <div class="card-header">📖 原始文本 (Original)</div>
+            <div class="source-info" style="margin-bottom: 12px; font-size: 0.9rem;">
+                <a href="https://moodhappy.github.io/MiyetsukoSeries/Books/Hundred/Chapter_001_1782296877406.html" target="_blank" style="color: #6c5ce7; text-decoration: none; font-weight: bold;">🔗 Chapter 1</a>
+            </div>
+            <div id="view-original" class="markdown-body"></div>
+            <textarea id="edit-original" class="edit-textarea"></textarea>
+        </div>
+
+        <div class="card" id="block-analysis">
+            <div class="card-header">🔬 深度解构 (Analysis)</div>
+            <div id="view-analysis" class="markdown-body"></div>
+            <textarea id="edit-analysis" class="edit-textarea"></textarea>
+        </div>
+    </div>
+
+    <script>
+        const GH_OWNER = "moodHappy";
+        const GH_REPO = "OneHundredYearsReading";
+        const ACCENT = "#6c5ce7";
+        function escapeHTML(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+        const buildHTML = function(title, safeOrig, safeAnal, safePageTitle, safePageUrl, GH_OWNER, GH_REPO, accent, escapeFnStr, builderFnStr) {
+        return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>${title}</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></scr`+`ipt>
+    <style>
+        :root { --bg: #fcfcfc; --surface: #ffffff; --text: #2c3e50; --border: #ecf0f1; --accent: ${accent}; --highlight: #fef9e7; }
+        body { font-family: -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; padding-bottom: 50px;}
+        .nav-back { margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
+        .nav-back a { text-decoration: none; color: white; background: var(--text); padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .sync-status { font-size: 0.85rem; color: #27ae60; font-weight: bold; display: none; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; font-weight: bold;}
+        .markdown-body { font-size: 1.05rem; line-height: 1.6; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
+
+        /* 原文段落排版 p 标签增强 */
+        #view-original p { margin-bottom: 16px; color: #34495e; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; }
+        #view-original p:last-child { margin-bottom: 0; }
+
+        .markdown-body p { margin-top: 0; margin-bottom: 12px; }
+        .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 8px; padding-left: 20px; }
+        .markdown-body li { margin-bottom: 4px; }
+        .markdown-body blockquote { margin: 0 0 10px 0; padding: 10px 15px; background: var(--highlight); border-left: 5px solid #f1c40f; color: #5c4d22; font-family: Georgia, serif; font-size: 1.1rem; border-radius: 0 8px 8px 0; }
+        .markdown-body hr { border: 0; border-top: 1px dashed #bdc3c7; margin: 15px 0; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.95rem; }
+        .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+        .markdown-body th { background: #f8f9fa; color: var(--accent); }
+        .edit-textarea { width: 100%; min-height: 150px; padding: 15px; font-family: monospace; font-size: 1.05rem; border: 2px solid var(--accent); border-radius: 10px; box-sizing: border-box; resize: vertical; display: none; background: #fff; color: #2c3e50; line-height: 1.5; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1);}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-back">
+            <a href="../../index.html">🔙 返回矩阵枢纽</a>
+            <span class="sync-status" id="sync-status">📡 同步中...</span>
+        </div>
+        <textarea id="raw-original" style="display:none;">${safeOrig}</textarea>
+        <textarea id="raw-analysis" style="display:none;">${safeAnal}</textarea>
+        <textarea id="raw-page-title" style="display:none;">${safePageTitle}</textarea>
+        <textarea id="raw-page-url" style="display:none;">${safePageUrl}</textarea>
+
+        <div class="card" id="block-original">
+            <div class="card-header">📖 原始文本 (Original)</div>
+            <div class="source-info" style="margin-bottom: 12px; font-size: 0.9rem;">
+                <a href="${safePageUrl}" target="_blank" style="color: ${accent}; text-decoration: none; font-weight: bold;">🔗 ${safePageTitle}</a>
+            </div>
+            <div id="view-original" class="markdown-body"></div>
+            <textarea id="edit-original" class="edit-textarea"></textarea>
+        </div>
+
+        <div class="card" id="block-analysis">
+            <div class="card-header">🔬 深度解构 (Analysis)</div>
+            <div id="view-analysis" class="markdown-body"></div>
+            <textarea id="edit-analysis" class="edit-textarea"></textarea>
+        </div>
+    </div>
+
+    <script>
+        const GH_OWNER = "${GH_OWNER}";
+        const GH_REPO = "${GH_REPO}";
+        const ACCENT = "${accent}";
+        ${escapeFnStr}
+        const buildHTML = ${builderFnStr};
+
+        const renderAll = function() {
+            // 原文基于换行符转为 <p> 标签渲染
+            const rawOrig = document.getElementById('raw-original').value;
+            const paragraphs = rawOrig.split(/\\n+/).filter(p => p.trim() !== '');
+            document.getElementById('view-original').innerHTML = paragraphs.map(p => '<p>' + escapeHTML(p) + '</p>').join('');
+
+            // 教师级解构直接走 Markdown 渲染
+            const analContent = document.getElementById('raw-analysis').value;
+            try {
+                if (typeof marked !== 'undefined') {
+                    document.getElementById('view-analysis').innerHTML = marked.parse(analContent);
+                }
+            } catch(e) {
+                console.error("Markdown failed", e);
+            }
+        };
+
+        const triggerEditOrig = function() {
+            const viewBlock = document.getElementById('view-original');
+            const editBlock = document.getElementById('edit-original');
+            viewBlock.style.display = 'none';
+            editBlock.style.display = 'block';
+            editBlock.value = document.getElementById('raw-original').value;
+            editBlock.focus();
+        };
+
+        const triggerEditAnal = function() {
+            const viewBlock = document.getElementById('view-analysis');
+            const editBlock = document.getElementById('edit-analysis');
+            viewBlock.style.display = 'none';
+            editBlock.style.display = 'block';
+            editBlock.value = document.getElementById('raw-analysis').value;
+            editBlock.focus();
+        };
+
+        window.onload = renderAll;
+
+        // 统一静默同步函数
+        const saveToGitHub = async function() {
+            const token = localStorage.getItem('GH_TOKEN');
+            if(!token) return alert("⚠️ 缺少 GH_TOKEN。请确保在主枢纽页面配置过！");
+
+            const statusMsg = document.getElementById('sync-status');
+            statusMsg.style.display = 'block';
+            statusMsg.style.color = ACCENT;
+            statusMsg.innerText = '📡 静默同步中...';
+
+            const orig = document.getElementById('raw-original').value;
+            const anal = document.getElementById('raw-analysis').value;
+            const pTitle = document.getElementById('raw-page-title').value;
+            const pUrl = document.getElementById('raw-page-url').value;
+
+            const pureHtml = buildHTML(
+                document.title,
+                escapeHTML(orig),
+                escapeHTML(anal),
+                escapeHTML(pTitle),
+                escapeHTML(pUrl),
+                GH_OWNER,
+                GH_REPO,
+                ACCENT,
+                escapeHTML.toString(),
+                buildHTML.toString()
+            );
+
+            const path = window.location.pathname;
+            const fileRelPath = path.substring(path.indexOf('docs/'));
+            try {
+                const utf8Array = Array.from(new TextEncoder().encode(pureHtml));
+                const binaryString = utf8Array.map(b => String.fromCharCode(b)).join('');
+                const base64Html = btoa(binaryString);
+
+                const getRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
+                    headers: { 'Authorization': \`token \${token}\` }
+                });
+                const fileData = await getRes.json();
+
+                const putRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': \`token \${token}\`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: \`Auto-save update (Text/Analysis)\`,
+                        content: base64Html,
+                        sha: fileData.sha
+                    })
+                });
+
+                if(putRes.ok) {
+                    statusMsg.style.color = '#27ae60';
+                    statusMsg.innerText = '✅ 云端已同步';
+                    setTimeout(() => statusMsg.style.display = 'none', 3000);
+                } else {
+                    statusMsg.style.color = '#e74c3c';
+                    statusMsg.innerText = '❌ 同步失败';
+                }
+            } catch(e) {
+                statusMsg.style.color = '#e74c3c';
+                statusMsg.innerText = '❌ 网络断开';
+            }
+        };
+
+        // 绑定原文块事件
+        const viewOrig = document.getElementById('view-original');
+        const editOrig = document.getElementById('edit-original');
+        viewOrig.addEventListener('dblclick', triggerEditOrig);
+        viewOrig.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEditOrig(); });
+        editOrig.addEventListener('blur', async function() {
+            const newText = this.value.trim();
+            const oldText = document.getElementById('raw-original').value.trim();
+            this.style.display = 'none';
+            viewOrig.style.display = 'block';
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-original').value = newText;
+                renderAll();
+                await saveToGitHub();
+            }
+        });
+
+        // 绑定解析块事件
+        const viewAnal = document.getElementById('view-analysis');
+        const editAnal = document.getElementById('edit-analysis');
+        viewAnal.addEventListener('dblclick', triggerEditAnal);
+        viewAnal.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEditAnal(); });
+        editAnal.addEventListener('blur', async function() {
+            const newText = this.value.trim();
+            const oldText = document.getElementById('raw-analysis').value.trim();
+            this.style.display = 'none';
+            viewAnal.style.display = 'block';
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-analysis').value = newText;
+                renderAll();
+                await saveToGitHub();
+            }
+        });
+    </scr`+`ipt>
+</body>
+</html>`;
+    };
+
+        const renderAll = function() {
+            // 原文基于换行符转为 <p> 标签渲染
+            const rawOrig = document.getElementById('raw-original').value;
+            const paragraphs = rawOrig.split(/\n+/).filter(p => p.trim() !== '');
+            document.getElementById('view-original').innerHTML = paragraphs.map(p => '<p>' + escapeHTML(p) + '</p>').join('');
+
+            // 教师级解构直接走 Markdown 渲染
+            const analContent = document.getElementById('raw-analysis').value;
+            try {
+                if (typeof marked !== 'undefined') {
+                    document.getElementById('view-analysis').innerHTML = marked.parse(analContent);
+                }
+            } catch(e) {
+                console.error("Markdown failed", e);
+            }
+        };
+
+        const triggerEditOrig = function() {
+            const viewBlock = document.getElementById('view-original');
+            const editBlock = document.getElementById('edit-original');
+            viewBlock.style.display = 'none';
+            editBlock.style.display = 'block';
+            editBlock.value = document.getElementById('raw-original').value;
+            editBlock.focus();
+        };
+
+        const triggerEditAnal = function() {
+            const viewBlock = document.getElementById('view-analysis');
+            const editBlock = document.getElementById('edit-analysis');
+            viewBlock.style.display = 'none';
+            editBlock.style.display = 'block';
+            editBlock.value = document.getElementById('raw-analysis').value;
+            editBlock.focus();
+        };
+
+        window.onload = renderAll;
+
+        // 统一静默同步函数
+        const saveToGitHub = async function() {
+            const token = localStorage.getItem('GH_TOKEN');
+            if(!token) return alert("⚠️ 缺少 GH_TOKEN。请确保在主枢纽页面配置过！");
+
+            const statusMsg = document.getElementById('sync-status');
+            statusMsg.style.display = 'block';
+            statusMsg.style.color = ACCENT;
+            statusMsg.innerText = '📡 静默同步中...';
+
+            const orig = document.getElementById('raw-original').value;
+            const anal = document.getElementById('raw-analysis').value;
+            const pTitle = document.getElementById('raw-page-title').value;
+            const pUrl = document.getElementById('raw-page-url').value;
+
+            const pureHtml = buildHTML(
+                document.title,
+                escapeHTML(orig),
+                escapeHTML(anal),
+                escapeHTML(pTitle),
+                escapeHTML(pUrl),
+                GH_OWNER,
+                GH_REPO,
+                ACCENT,
+                escapeHTML.toString(),
+                buildHTML.toString()
+            );
+
+            const path = window.location.pathname;
+            const fileRelPath = path.substring(path.indexOf('docs/'));
+            try {
+                const utf8Array = Array.from(new TextEncoder().encode(pureHtml));
+                const binaryString = utf8Array.map(b => String.fromCharCode(b)).join('');
+                const base64Html = btoa(binaryString);
+
+                const getRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                const fileData = await getRes.json();
+
+                const putRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Auto-save update (Text/Analysis)`,
+                        content: base64Html,
+                        sha: fileData.sha
+                    })
+                });
+
+                if(putRes.ok) {
+                    statusMsg.style.color = '#27ae60';
+                    statusMsg.innerText = '✅ 云端已同步';
+                    setTimeout(() => statusMsg.style.display = 'none', 3000);
+                } else {
+                    statusMsg.style.color = '#e74c3c';
+                    statusMsg.innerText = '❌ 同步失败';
+                }
+            } catch(e) {
+                statusMsg.style.color = '#e74c3c';
+                statusMsg.innerText = '❌ 网络断开';
+            }
+        };
+
+        // 绑定原文块事件
+        const viewOrig = document.getElementById('view-original');
+        const editOrig = document.getElementById('edit-original');
+        viewOrig.addEventListener('dblclick', triggerEditOrig);
+        viewOrig.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEditOrig(); });
+        editOrig.addEventListener('blur', async function() {
+            const newText = this.value.trim();
+            const oldText = document.getElementById('raw-original').value.trim();
+            this.style.display = 'none';
+            viewOrig.style.display = 'block';
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-original').value = newText;
+                renderAll();
+                await saveToGitHub();
+            }
+        });
+
+        // 绑定解析块事件
+        const viewAnal = document.getElementById('view-analysis');
+        const editAnal = document.getElementById('edit-analysis');
+        viewAnal.addEventListener('dblclick', triggerEditAnal);
+        viewAnal.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEditAnal(); });
+        editAnal.addEventListener('blur', async function() {
+            const newText = this.value.trim();
+            const oldText = document.getElementById('raw-analysis').value.trim();
+            this.style.display = 'none';
+            viewAnal.style.display = 'block';
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-analysis').value = newText;
+                renderAll();
+                await saveToGitHub();
+            }
+        });
+    </script>
+</body>
+</html>
