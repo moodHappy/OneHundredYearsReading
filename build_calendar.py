@@ -33,17 +33,17 @@ def generate_index():
 
                         title = "📌 语法解构"
                         original_text = "" # 用于存放提取出的原始英文文本
-                        
+
                         # 通读文件，精准解构 Title 与原始文本内容
                         with open(os.path.join(BASE_DIR, year, month, file), 'r', encoding='utf-8') as f_html:
                             content = f_html.read()
-                            
+
                             # 提取标题
                             start = content.find('<title>')
                             end = content.find('</title>')
                             if start != -1 and end != -1:
                                 title = content[start+7:end]
-                            
+
                             # 提取指定的 raw-original 内容
                             orig_start_tag = '<textarea id="raw-original" style="display:none;">'
                             start_orig = content.find(orig_start_tag)
@@ -54,7 +54,7 @@ def generate_index():
 
                         if d_int not in archive_data[y_int][m_int]:
                             archive_data[y_int][m_int][d_int] = []
-                            
+
                         # 将原文沉淀进 JSON 数据库中
                         archive_data[y_int][m_int][d_int].append({
                             "time": time_str, 
@@ -109,11 +109,16 @@ def generate_index():
         
         /* 极致紧凑一行流行表 */
         .feed-list { display: flex; flex-direction: column; gap: 12px; }
-        .feed-item { background: var(--card); padding: 16px 18px; border-radius: 12px; text-decoration: none; color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: row; align-items: center; gap: 15px; transition: transform 0.2s; border: 1px solid transparent; }
+        .feed-item { background: var(--card); padding: 16px 18px; border-radius: 12px; text-decoration: none; color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: row; align-items: center; gap: 15px; transition: transform 0.2s; border: 1px solid transparent; flex-grow: 1; border-left: 4px solid #ff4757; }
         .feed-item:active { transform: scale(0.98); background: #fafafa; }
         .feed-time { font-family: -apple-system, sans-serif; font-weight: 800; color: #111; font-size: 0.95rem; flex-shrink: 0; min-width: 45px; text-align: center; }
         .feed-title { color: #7f8c8d; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; }
         
+        /* 删除按钮样式 */
+        .btn-delete { background: #ff4757; color: white; border: none; border-radius: 12px; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(255,71,87,0.2); transition: transform 0.2s, background 0.2s; flex-shrink: 0; padding: 0; }
+        .btn-delete:active { transform: scale(0.9); background: #ff6b81; }
+        .btn-delete:disabled { opacity: 0.5; cursor: not-allowed; }
+
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: var(--primary); font-size: 0.95rem; }
         .form-control { width: 100%; box-sizing: border-box; padding: 15px; border: 1px solid var(--border); border-radius: 10px; font-size: 1rem; font-family: inherit; resize: vertical; background: var(--card); }
@@ -255,7 +260,15 @@ def generate_index():
             const data = (archiveData[sY] && archiveData[sY][sM] && archiveData[sY][sM][sD]) || [];
             
             if(data.length) {
-                const itemsHtml = data.map(item => `<a href="${item.path}" class="feed-item"><span class="feed-time">${item.time}</span><span class="feed-title">${item.title}</span></a>`).join('');
+                const itemsHtml = data.map(item => `
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <a href="${item.path}" class="feed-item">
+                            <span class="feed-time">${item.time}</span>
+                            <span class="feed-title">${item.title}</span>
+                        </a>
+                        <button class="btn-delete" onclick="deleteEntry(event, '${item.path}', '${escapeJs(item.title)}')">🗑️</button>
+                    </div>
+                `).join('');
                 list.innerHTML = itemsHtml;
             } else {
                 list.innerHTML = '<div style="text-align:center; padding: 25px 20px; color:#bdc3c7; font-size: 0.9rem;">当日无其他解构档案</div>';
@@ -294,10 +307,13 @@ def generate_index():
                                     matchCount++;
                                     const datePrefix = `${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`;
                                     resultsHtml += `
-                                        <a href="${item.path}" class="feed-item">
-                                            <span class="feed-time" style="min-width: 55px; font-size: 0.85rem; color: #e74c3c; background: #fdedec; border-radius: 6px; padding: 2px 4px;">${datePrefix}</span>
-                                            <span class="feed-title">${item.title}</span>
-                                        </a>`;
+                                        <div style="display:flex; align-items:center; gap:10px; margin-bottom: 12px;">
+                                            <a href="${item.path}" class="feed-item" style="margin-bottom:0;">
+                                                <span class="feed-time" style="min-width: 55px; font-size: 0.85rem; color: #e74c3c; background: #fdedec; border-radius: 6px; padding: 2px 4px;">${datePrefix}</span>
+                                                <span class="feed-title">${item.title}</span>
+                                            </a>
+                                            <button class="btn-delete" onclick="deleteEntry(event, '${item.path}', '${escapeJs(item.title)}')">🗑️</button>
+                                        </div>`;
                                 }
                             });
                         }
@@ -379,6 +395,91 @@ def generate_index():
                       .replace(/>/g, '&gt;')
                       .replace(/"/g, '&quot;')
                       .replace(/'/g, '&#039;');
+        }
+
+        function escapeJs(str) {
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        // ==========================================
+        // 云端同步删除功能
+        // ==========================================
+        async function deleteEntry(event, relPath, title) {
+            if (!confirm(`⚠️ 确定要彻底删除 [ ${title} ] 吗？\\n此操作将同步删除 GitHub 上的静态文件且不可恢复！`)) return;
+
+            const token = localStorage.getItem('GH_TOKEN');
+            if(!token) {
+                document.getElementById('modal').style.display='flex';
+                return;
+            }
+
+            const btn = event.currentTarget;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '⏳';
+            btn.disabled = true;
+
+            const repoPath = `docs/${relPath}`;
+
+            try {
+                // 1. 获取目标文件信息(拿到 sha)
+                const getRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${repoPath}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                
+                if (!getRes.ok) {
+                    if(getRes.status === 404) {
+                        alert("文件似乎已经被删除了，正在清理本地缓存。");
+                    } else {
+                        throw new Error("无法获取文件权限，检查 Token 是否具备 repo 权限。");
+                    }
+                }
+                
+                let sha = null;
+                if(getRes.ok) {
+                    const fileData = await getRes.json();
+                    sha = fileData.sha;
+                }
+
+                // 2. 调用 API 执行删除
+                if (sha) {
+                    const delRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${repoPath}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            message: `Macondo Matrix: User deleted ${title}`,
+                            sha: sha
+                        })
+                    });
+
+                    if (!delRes.ok) {
+                        const err = await delRes.json();
+                        throw new Error(err.message);
+                    }
+                }
+
+                // 3. 同步剔除本地字典里的对应数据结构
+                for (const y in archiveData) {
+                    for (const m in archiveData[y]) {
+                        for (const d in archiveData[y][m]) {
+                            archiveData[y][m][d] = archiveData[y][m][d].filter(i => i.path !== relPath);
+                        }
+                    }
+                }
+
+                // 4. 无感刷新 UI
+                if (document.getElementById('searchInput').value.trim() !== '') {
+                    // 如果处于搜索态，重新触发搜素以刷新列表
+                    document.getElementById('searchInput').dispatchEvent(new Event('input'));
+                } else {
+                    renderCalendar();
+                    renderList();
+                }
+
+            } catch(e) { 
+                alert("❌ 删除失败: " + e.message); 
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
         }
 
         async function pushToGitHub() {
@@ -632,10 +733,6 @@ def generate_index():
         editBlock.addEventListener('blur', editBlock.onblur);
 
     </scr` + `ipt>
-</body>
-</html>`;
-        }
-    </script>
 </body>
 </html>"""
 
