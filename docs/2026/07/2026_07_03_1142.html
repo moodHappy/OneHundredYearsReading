@@ -310,6 +310,143 @@
                 const binaryString = utf8Array.map(b => String.fromCharCode(b)).join('');
                 const base64Html = btoa(binaryString);
 
+                const getRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
+                    headers: { 'Authorization': \`token \${token}\` }
+                });
+                const fileData = await getRes.json();
+
+                const putRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': \`token \${token}\`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: \`Auto-save update (Text/Analysis)\`,
+                        content: base64Html,
+                        sha: fileData.sha
+                    })
+                });
+
+                if(putRes.ok) {
+                    statusMsg.style.color = '#27ae60';
+                    statusMsg.innerText = '✅ 云端已同步';
+                    setTimeout(() => statusMsg.style.display = 'none', 3000);
+                } else {
+                    statusMsg.style.color = '#e74c3c';
+                    statusMsg.innerText = '❌ 同步失败';
+                }
+            } catch(e) {
+                statusMsg.style.color = '#e74c3c';
+                statusMsg.innerText = '❌ 网络断开';
+            }
+        };
+
+        const viewOrig = document.getElementById('view-original');
+        const editOrig = document.getElementById('edit-original');
+        viewOrig.addEventListener('dblclick', triggerEditOrig);
+        viewOrig.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEditOrig(); });
+        editOrig.addEventListener('blur', async function() {
+            const newText = this.value.trim();
+            const oldText = document.getElementById('raw-original').value.trim();
+            this.style.display = 'none';
+            viewOrig.style.display = 'block';
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-original').value = newText;
+                renderAll();
+                await saveToGitHub();
+            }
+        });
+
+        const viewAnal = document.getElementById('view-analysis');
+        const editAnal = document.getElementById('edit-analysis');
+        viewAnal.addEventListener('dblclick', triggerEditAnal);
+        viewAnal.addEventListener('touchstart', e => { if (e.touches.length === 2) triggerEditAnal(); });
+        editAnal.addEventListener('blur', async function() {
+            const newText = this.value.trim();
+            const oldText = document.getElementById('raw-analysis').value.trim();
+            this.style.display = 'none';
+            viewAnal.style.display = 'block';
+            if (newText && newText !== oldText) {
+                document.getElementById('raw-analysis').value = newText;
+                renderAll();
+                await saveToGitHub();
+            }
+        });
+    </scr`+`ipt>
+</body>
+</html>`;
+    };
+
+        const renderAll = function() {
+            const rawOrig = document.getElementById('raw-original').value;
+            const paragraphs = rawOrig.split(/\n+/).filter(p => p.trim() !== '');
+            document.getElementById('view-original').innerHTML = paragraphs.map(p => '<p>' + escapeHTML(p) + '</p>').join('');
+
+            const analContent = document.getElementById('raw-analysis').value;
+            try {
+                if (typeof marked !== 'undefined') {
+                    document.getElementById('view-analysis').innerHTML = marked.parse(analContent);
+                }
+            } catch(e) {
+                console.error("Markdown failed", e);
+            }
+        };
+
+        const triggerEditOrig = function() {
+            const viewBlock = document.getElementById('view-original');
+            const editBlock = document.getElementById('edit-original');
+            viewBlock.style.display = 'none';
+            editBlock.style.display = 'block';
+            editBlock.value = document.getElementById('raw-original').value;
+            editBlock.focus();
+        };
+
+        const triggerEditAnal = function() {
+            const viewBlock = document.getElementById('view-analysis');
+            const editBlock = document.getElementById('edit-analysis');
+            viewBlock.style.display = 'none';
+            editBlock.style.display = 'block';
+            editBlock.value = document.getElementById('raw-analysis').value;
+            editBlock.focus();
+        };
+
+        window.onload = renderAll;
+
+        const saveToGitHub = async function() {
+            const token = localStorage.getItem('GH_TOKEN');
+            if(!token) return alert("⚠️ 缺少 GH_TOKEN。请确保在主枢纽页面配置过！");
+
+            const statusMsg = document.getElementById('sync-status');
+            statusMsg.style.display = 'block';
+            statusMsg.style.color = ACCENT;
+            statusMsg.innerText = '📡 静默同步中...';
+
+            const orig = document.getElementById('raw-original').value;
+            const anal = document.getElementById('raw-analysis').value;
+            const pTitle = document.getElementById('raw-page-title').value;
+            const pUrl = document.getElementById('raw-page-url').value;
+
+            const pureHtml = buildHTML(
+                document.title,
+                escapeHTML(orig),
+                escapeHTML(anal),
+                escapeHTML(pTitle),
+                escapeHTML(pUrl),
+                GH_OWNER,
+                GH_REPO,
+                ACCENT,
+                escapeHTML.toString(),
+                buildHTML.toString()
+            );
+
+            const path = window.location.pathname;
+            const fileRelPath = path.substring(path.indexOf('docs/'));
+            try {
+                const utf8Array = Array.from(new TextEncoder().encode(pureHtml));
+                const binaryString = utf8Array.map(b => String.fromCharCode(b)).join('');
+                const base64Html = btoa(binaryString);
+
                 const getRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, {
                     headers: { 'Authorization': `token ${token}` }
                 });
@@ -373,6 +510,6 @@
                 await saveToGitHub();
             }
         });
-    </scr`+`ipt>
+    </script>
 </body>
 </html>

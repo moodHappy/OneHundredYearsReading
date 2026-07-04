@@ -17,7 +17,6 @@
         .markdown-body { font-size: 1.05rem; line-height: 1.6; }
         .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
 
-        /* 原文段落排版 p 标签增强 */
         #view-original p { margin-bottom: 16px; color: #34495e; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; }
         #view-original p:last-child { margin-bottom: 0; }
 
@@ -174,7 +173,6 @@ When José Arcadio Buendía and the four men of his expedition managed to take t
         .markdown-body { font-size: 1.05rem; line-height: 1.6; }
         .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
 
-        /* 原文段落排版 p 标签增强 */
         #view-original p { margin-bottom: 16px; color: #34495e; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; }
         #view-original p:last-child { margin-bottom: 0; }
 
@@ -224,12 +222,10 @@ When José Arcadio Buendía and the four men of his expedition managed to take t
         const buildHTML = ${builderFnStr};
 
         const renderAll = function() {
-            // 原文基于换行符转为 <p> 标签渲染
             const rawOrig = document.getElementById('raw-original').value;
             const paragraphs = rawOrig.split(/\\n+/).filter(p => p.trim() !== '');
             document.getElementById('view-original').innerHTML = paragraphs.map(p => '<p>' + escapeHTML(p) + '</p>').join('');
 
-            // 教师级解构直接走 Markdown 渲染
             const analContent = document.getElementById('raw-analysis').value;
             try {
                 if (typeof marked !== 'undefined') {
@@ -260,7 +256,6 @@ When José Arcadio Buendía and the four men of his expedition managed to take t
 
         window.onload = renderAll;
 
-        // 统一静默同步函数
         const saveToGitHub = async function() {
             const token = localStorage.getItem('GH_TOKEN');
             if(!token) return alert("⚠️ 缺少 GH_TOKEN。请确保在主枢纽页面配置过！");
@@ -327,7 +322,6 @@ When José Arcadio Buendía and the four men of his expedition managed to take t
             }
         };
 
-        // 绑定原文块事件
         const viewOrig = document.getElementById('view-original');
         const editOrig = document.getElementById('edit-original');
         viewOrig.addEventListener('dblclick', triggerEditOrig);
@@ -344,7 +338,6 @@ When José Arcadio Buendía and the four men of his expedition managed to take t
             }
         });
 
-        // 绑定解析块事件
         const viewAnal = document.getElementById('view-analysis');
         const editAnal = document.getElementById('edit-analysis');
         viewAnal.addEventListener('dblclick', triggerEditAnal);
@@ -366,12 +359,10 @@ When José Arcadio Buendía and the four men of his expedition managed to take t
     };
 
         const renderAll = function() {
-            // 原文基于换行符转为 <p> 标签渲染
             const rawOrig = document.getElementById('raw-original').value;
             const paragraphs = rawOrig.split(/\n+/).filter(p => p.trim() !== '');
             document.getElementById('view-original').innerHTML = paragraphs.map(p => '<p>' + escapeHTML(p) + '</p>').join('');
 
-            // 教师级解构直接走 Markdown 渲染
             const analContent = document.getElementById('raw-analysis').value;
             try {
                 if (typeof marked !== 'undefined') {
@@ -402,7 +393,6 @@ When José Arcadio Buendía and the four men of his expedition managed to take t
 
         window.onload = renderAll;
 
-        // 统一静默同步函数
         const saveToGitHub = async function() {
             const token = localStorage.getItem('GH_TOKEN');
             if(!token) return alert("⚠️ 缺少 GH_TOKEN。请确保在主枢纽页面配置过！");
@@ -469,7 +459,6 @@ When José Arcadio Buendía and the four men of his expedition managed to take t
             }
         };
 
-        // 绑定原文块事件
         const viewOrig = document.getElementById('view-original');
         const editOrig = document.getElementById('edit-original');
         viewOrig.addEventListener('dblclick', triggerEditOrig);
@@ -486,7 +475,6 @@ When José Arcadio Buendía and the four men of his expedition managed to take t
             }
         });
 
-        // 绑定解析块事件
         const viewAnal = document.getElementById('view-analysis');
         const editAnal = document.getElementById('edit-analysis');
         viewAnal.addEventListener('dblclick', triggerEditAnal);
