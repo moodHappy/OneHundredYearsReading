@@ -16,11 +16,8 @@
         .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; font-weight: bold;}
         .markdown-body { font-size: 1.05rem; line-height: 1.6; }
         .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
-
-        /* 原文段落排版 p 标签增强 */
         #view-original p { margin-bottom: 16px; color: #34495e; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; }
         #view-original p:last-child { margin-bottom: 0; }
-
         .markdown-body p { margin-top: 0; margin-bottom: 12px; }
         .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 8px; padding-left: 20px; }
         .markdown-body li { margin-bottom: 4px; }
@@ -38,99 +35,11 @@
             <a href="../../index.html">🔙 返回矩阵枢纽</a>
             <span class="sync-status" id="sync-status">📡 同步中...</span>
         </div>
+        <!-- 核心修复区：烙印绝对文件路径，彻底抛弃通过 window.location.pathname 的脆弱计算方式 -->
+        <textarea id="raw-file-path" style="display:none;">docs/2026/07/2026_07_04_2249.html</textarea>
+
         <textarea id="raw-original" style="display:none;">The world was so recent that many things lacked names, and in order to indicate them it was necessary to point.</textarea>
-        <textarea id="raw-analysis" style="display:none;"># 📌 完整翻译
-
-这个世界还如此新近，以至于许多事物都还没有名字；要指代它们，只能用手去指。
-
-每年三月，一个衣衫褴褛的吉普赛家族都会在村庄附近扎下帐篷，他们伴随着管乐与鼓点的巨大喧嚣，展示各种新发明。
-
-他们首先带来的是磁铁。
-
----
-
-# 📘 英语教学式讲解
-
-## 1. The world was so recent
-- 这个世界还如此“新近”。  
-- was so recent：结构上强调状态，“recent”在这里并非时间短，而是“刚刚形成、尚未成熟”的世界观。  
-- the world：在文学语境中常指“人类认知中的世界秩序”。  
-
----
-
-## 2. that many things lacked names
-- 以至于许多事物都缺乏名字。  
-- that：结果状语从句  
-- lacked names：没有被命名（语言体系尚未建立完整分类）  
-
----
-
-## 3. and in order to indicate them
-- 为了指代它们。  
-- in order to：目的结构（“为了”）  
-- indicate：指示、指代（比 show 更抽象）  
-
----
-
-## 4. it was necessary to point
-- 只能靠指来表达。  
-- it was necessary to：形式主语结构（客观必要性）  
-- point：用手指指向（最原始的指称方式）  
-
----
-
-## 5. Every year during the month of March
-- 每年三月期间。  
-- during the month of March：时间范围强调  
-- Every year：周期性事件  
-
----
-
-## 6. a family of ragged gypsies would set up their tents near the village
-- 一群衣衫褴褛的吉普赛家庭会在村庄附近扎营。  
-- ragged：破旧的、衣衫褴褛的  
-- gypsies：吉普赛人（游牧群体，带历史文化语境）  
-- would set up：过去习惯动作（would + 动词 = “过去常常”）  
-- set up tents：搭帐篷  
-
----
-
-## 7. and with a great uproar of pipes and kettledrums
-- 伴随着管乐和定音鼓的巨大喧闹声。  
-- uproar：喧嚣、轰动性噪音  
-- pipes：管乐器  
-- kettledrums：定音鼓  
-- and with：伴随状语结构  
-
----
-
-## 8. they would display new inventions
-- 他们会展示新发明。  
-- display：展示、展出  
-- new inventions：新奇的发明（带“马戏团式科技展示”语气）  
-
----
-
-## 9. First they brought the magnet
-- 他们首先带来的是磁铁。  
-- First：顺序副词（强调开端）  
-- brought：带来（过去式）  
-- the magnet：磁铁（象征“科学/奇迹/未理解的力量”）  
-
----
-
-# 📌 Key Expressions
-
-- so recent that —— 如此新近以至于  
-- lack names —— 缺乏名称  
-- in order to —— 为了  
-- it was necessary to do —— 有必要做某事  
-- set up tents —— 扎营  
-- ragged gypsies —— 衣衫褴褛的吉普赛人  
-- would (past habit) —— 过去常常  
-- uproar of pipes and kettledrums —— 管乐与鼓声的喧闹  
-- display inventions —— 展示发明  
-- bring the magnet —— 带来磁铁</textarea>
+        <textarea id="raw-analysis" style="display:none;">1</textarea>
         <textarea id="raw-page-title" style="display:none;">Chapter 1</textarea>
         <textarea id="raw-page-url" style="display:none;">https://moodhappy.github.io/MiyetsukoSeries/Books/Hundred/Chapter_001_1782296877406.html</textarea>
 
@@ -157,7 +66,7 @@
         function escapeHTML(str) {
         return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
-        const buildHTML = function(title, safeOrig, safeAnal, safePageTitle, safePageUrl, GH_OWNER, GH_REPO, accent, escapeFnStr, builderFnStr) {
+        const buildHTML = function(title, safeOrig, safeAnal, safePageTitle, safePageUrl, GH_OWNER, GH_REPO, accent, escapeFnStr, builderFnStr, safeFilePath) {
         return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -176,11 +85,8 @@
         .card-header { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 12px; font-weight: bold;}
         .markdown-body { font-size: 1.05rem; line-height: 1.6; }
         .markdown-body h1, .markdown-body h2, .markdown-body h3 { color: var(--accent); margin-top: 16px; margin-bottom: 8px; font-weight: 700; border-bottom: 1px dashed #eee; padding-bottom: 4px; }
-
-        /* 原文段落排版 p 标签增强 */
         #view-original p { margin-bottom: 16px; color: #34495e; font-family: Georgia, serif; font-size: 1.15rem; line-height: 1.8; }
         #view-original p:last-child { margin-bottom: 0; }
-
         .markdown-body p { margin-top: 0; margin-bottom: 12px; }
         .markdown-body ul, .markdown-body ol { margin-top: 0; margin-bottom: 8px; padding-left: 20px; }
         .markdown-body li { margin-bottom: 4px; }
@@ -198,6 +104,9 @@
             <a href="../../index.html">🔙 返回矩阵枢纽</a>
             <span class="sync-status" id="sync-status">📡 同步中...</span>
         </div>
+        <!-- 核心修复区：烙印绝对文件路径，彻底抛弃通过 window.location.pathname 的脆弱计算方式 -->
+        <textarea id="raw-file-path" style="display:none;">${safeFilePath}</textarea>
+
         <textarea id="raw-original" style="display:none;">${safeOrig}</textarea>
         <textarea id="raw-analysis" style="display:none;">${safeAnal}</textarea>
         <textarea id="raw-page-title" style="display:none;">${safePageTitle}</textarea>
@@ -227,12 +136,10 @@
         const buildHTML = ${builderFnStr};
 
         const renderAll = function() {
-            // 原文基于换行符转为 <p> 标签渲染
             const rawOrig = document.getElementById('raw-original').value;
             const paragraphs = rawOrig.split(/\\n+/).filter(p => p.trim() !== '');
             document.getElementById('view-original').innerHTML = paragraphs.map(p => '<p>' + escapeHTML(p) + '</p>').join('');
 
-            // 教师级解构直接走 Markdown 渲染
             const analContent = document.getElementById('raw-analysis').value;
             try {
                 if (typeof marked !== 'undefined') {
@@ -263,7 +170,6 @@
 
         window.onload = renderAll;
 
-        // 统一静默同步函数
         const saveToGitHub = async function() {
             const token = localStorage.getItem('GH_TOKEN');
             if(!token) return alert("⚠️ 缺少 GH_TOKEN。请确保在主枢纽页面配置过！");
@@ -277,6 +183,14 @@
             const anal = document.getElementById('raw-analysis').value;
             const pTitle = document.getElementById('raw-page-title').value;
             const pUrl = document.getElementById('raw-page-url').value;
+            // 核心修复：直接读取硬编码在HTML中的绝对路径，绝不出错
+            const fileRelPath = document.getElementById('raw-file-path').value;
+
+            if(!fileRelPath) {
+                statusMsg.style.color = '#e74c3c';
+                statusMsg.innerText = '❌ 找不到文件路径映射';
+                return;
+            }
 
             const pureHtml = buildHTML(
                 document.title,
@@ -288,18 +202,23 @@
                 GH_REPO,
                 ACCENT,
                 escapeHTML.toString(),
-                buildHTML.toString()
+                buildHTML.toString(),
+                escapeHTML(fileRelPath) // 把路径再封包传进新的HTML
             );
 
-            const path = window.location.pathname;
-            const fileRelPath = path.substring(path.indexOf('docs/'));
             try {
-                const utf8Array = Array.from(new TextEncoder().encode(pureHtml));
-                const binaryString = utf8Array.map(b => String.fromCharCode(b)).join('');
+                // 更底层的 UTF-8 -> Base64，防止大数据量溢出
+                const bytes = new Uint8Array(new TextEncoder().encode(pureHtml));
+                let binaryString = '';
+                for (let i = 0; i < bytes.byteLength; i++) {
+                    binaryString += String.fromCharCode(bytes[i]);
+                }
                 const base64Html = btoa(binaryString);
 
+                // 核心修复：增加 cache: 'no-store' 强制获取最新 SHA，解决连续保存报错 409
                 const getRes = await fetch(\`https://api.github.com/repos/\${GH_OWNER}/\${GH_REPO}/contents/\${fileRelPath}\`, {
-                    headers: { 'Authorization': \`token \${token}\` }
+                    headers: { 'Authorization': \`token \${token}\` },
+                    cache: 'no-store'
                 });
                 const fileData = await getRes.json();
 
@@ -312,7 +231,7 @@
                     body: JSON.stringify({
                         message: \`Auto-save update (Text/Analysis)\`,
                         content: base64Html,
-                        sha: fileData.sha
+                        sha: fileData.sha // 如果文件不存在，这里是 undefined，刚好触发新建文件逻辑
                     })
                 });
 
@@ -321,16 +240,18 @@
                     statusMsg.innerText = '✅ 云端已同步';
                     setTimeout(() => statusMsg.style.display = 'none', 3000);
                 } else {
+                    const errDetail = await putRes.json();
                     statusMsg.style.color = '#e74c3c';
-                    statusMsg.innerText = '❌ 同步失败';
+                    statusMsg.innerText = '❌ 拒绝同步: ' + (errDetail.message || 'Error');
+                    console.error('GitHub API 报错:', errDetail);
                 }
             } catch(e) {
                 statusMsg.style.color = '#e74c3c';
-                statusMsg.innerText = '❌ 网络断开';
+                statusMsg.innerText = '❌ 网络或权限断开';
+                console.error(e);
             }
         };
 
-        // 绑定原文块事件
         const viewOrig = document.getElementById('view-original');
         const editOrig = document.getElementById('edit-original');
         viewOrig.addEventListener('dblclick', triggerEditOrig);
@@ -347,7 +268,6 @@
             }
         });
 
-        // 绑定解析块事件
         const viewAnal = document.getElementById('view-analysis');
         const editAnal = document.getElementById('edit-analysis');
         viewAnal.addEventListener('dblclick', triggerEditAnal);
@@ -369,12 +289,10 @@
     };
 
         const renderAll = function() {
-            // 原文基于换行符转为 <p> 标签渲染
             const rawOrig = document.getElementById('raw-original').value;
             const paragraphs = rawOrig.split(/\n+/).filter(p => p.trim() !== '');
             document.getElementById('view-original').innerHTML = paragraphs.map(p => '<p>' + escapeHTML(p) + '</p>').join('');
 
-            // 教师级解构直接走 Markdown 渲染
             const analContent = document.getElementById('raw-analysis').value;
             try {
                 if (typeof marked !== 'undefined') {
@@ -405,7 +323,6 @@
 
         window.onload = renderAll;
 
-        // 统一静默同步函数
         const saveToGitHub = async function() {
             const token = localStorage.getItem('GH_TOKEN');
             if(!token) return alert("⚠️ 缺少 GH_TOKEN。请确保在主枢纽页面配置过！");
@@ -419,6 +336,14 @@
             const anal = document.getElementById('raw-analysis').value;
             const pTitle = document.getElementById('raw-page-title').value;
             const pUrl = document.getElementById('raw-page-url').value;
+            // 核心修复：直接读取硬编码在HTML中的绝对路径，绝不出错
+            const fileRelPath = document.getElementById('raw-file-path').value;
+
+            if(!fileRelPath) {
+                statusMsg.style.color = '#e74c3c';
+                statusMsg.innerText = '❌ 找不到文件路径映射';
+                return;
+            }
 
             const pureHtml = buildHTML(
                 document.title,
@@ -430,18 +355,23 @@
                 GH_REPO,
                 ACCENT,
                 escapeHTML.toString(),
-                buildHTML.toString()
+                buildHTML.toString(),
+                escapeHTML(fileRelPath) // 把路径再封包传进新的HTML
             );
 
-            const path = window.location.pathname;
-            const fileRelPath = path.substring(path.indexOf('docs/'));
             try {
-                const utf8Array = Array.from(new TextEncoder().encode(pureHtml));
-                const binaryString = utf8Array.map(b => String.fromCharCode(b)).join('');
+                // 更底层的 UTF-8 -> Base64，防止大数据量溢出
+                const bytes = new Uint8Array(new TextEncoder().encode(pureHtml));
+                let binaryString = '';
+                for (let i = 0; i < bytes.byteLength; i++) {
+                    binaryString += String.fromCharCode(bytes[i]);
+                }
                 const base64Html = btoa(binaryString);
 
+                // 核心修复：增加 cache: 'no-store' 强制获取最新 SHA，解决连续保存报错 409
                 const getRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${fileRelPath}`, {
-                    headers: { 'Authorization': `token ${token}` }
+                    headers: { 'Authorization': `token ${token}` },
+                    cache: 'no-store'
                 });
                 const fileData = await getRes.json();
 
@@ -454,7 +384,7 @@
                     body: JSON.stringify({
                         message: `Auto-save update (Text/Analysis)`,
                         content: base64Html,
-                        sha: fileData.sha
+                        sha: fileData.sha // 如果文件不存在，这里是 undefined，刚好触发新建文件逻辑
                     })
                 });
 
@@ -463,16 +393,18 @@
                     statusMsg.innerText = '✅ 云端已同步';
                     setTimeout(() => statusMsg.style.display = 'none', 3000);
                 } else {
+                    const errDetail = await putRes.json();
                     statusMsg.style.color = '#e74c3c';
-                    statusMsg.innerText = '❌ 同步失败';
+                    statusMsg.innerText = '❌ 拒绝同步: ' + (errDetail.message || 'Error');
+                    console.error('GitHub API 报错:', errDetail);
                 }
             } catch(e) {
                 statusMsg.style.color = '#e74c3c';
-                statusMsg.innerText = '❌ 网络断开';
+                statusMsg.innerText = '❌ 网络或权限断开';
+                console.error(e);
             }
         };
 
-        // 绑定原文块事件
         const viewOrig = document.getElementById('view-original');
         const editOrig = document.getElementById('edit-original');
         viewOrig.addEventListener('dblclick', triggerEditOrig);
@@ -489,7 +421,6 @@
             }
         });
 
-        // 绑定解析块事件
         const viewAnal = document.getElementById('view-analysis');
         const editAnal = document.getElementById('edit-analysis');
         viewAnal.addEventListener('dblclick', triggerEditAnal);
