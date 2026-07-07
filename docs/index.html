@@ -147,8 +147,17 @@
         const searchInput = document.getElementById('searchInput');
         
         function initSelects() {
-            const years = Object.keys(archiveData).map(Number).sort((a,b)=>b-a);
-            if(!years.includes(sY)) years.unshift(sY);
+            // 获取已有数据的年份并使用 Set 去重
+            let yearSet = new Set(Object.keys(archiveData).map(Number));
+            
+            // 强制加入当前年份以及未来 20 年的选项
+            for(let i = 0; i <= 20; i++) {
+                yearSet.add(sY + i);
+            }
+            
+            // 转换为数组并降序排列（年份大的在上面），保持你原先代码的习惯
+            const years = Array.from(yearSet).sort((a,b)=>b-a);
+            
             years.forEach(y => {
                 const opt = document.createElement('option'); opt.value = y; opt.textContent = y + '年';
                 yearSelect.appendChild(opt);
